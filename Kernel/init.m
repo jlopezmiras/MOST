@@ -4,7 +4,7 @@
 
 (*Load FeynCalc+FeynArts*)
 $LoadAddOns={"FeynArts"};
-$FeynCalcStartupMessages=False;
+$FeynCalcStartupMessages=True;
 Get["MOST`ExternalPackages`FeynCalc`"];
 $FAVerbose=0;
 

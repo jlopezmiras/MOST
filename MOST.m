@@ -102,12 +102,6 @@ Block[{fontfamily="Alegreya SC", bigSize=32, smallSize=30, colorize},
 Begin["`Private`"]
 
 
-N[153/256]
-
-
-RGBColor[1,0.45,0.19]
-
-
 (* ::Section:: *)
 (*Basis Reduction*)
 
@@ -142,10 +136,17 @@ MassReduction[field_, modelfull_, modelphys_, EFTOrder_]:=Module[{massphys,solve
 
 Options[RedBasis] = {CoefDimensions->{}, Process->{}};
 RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction={}, ampsNumeric},
+
+	tIni = SessionTime[];
 	
 	(*Computation of physical poles, residues and propagators*)
 	AllPropagatorAttributes[modelfull,EFTOrder];
 	AllPropagatorAttributes[modelphys,EFTOrder];
+	
+	MPhysSymbolEquiv = Select[Flatten@ Replace[
+						GatherBy[GetFields[modelphys], mphys2[#,modelphys] &],
+						{f1_,fs__} :> (#->f1&/@ List[fs]), 2]
+							,Head[#]===Rule&];
 	
 	reduction = Join[reduction, AllMassReduction[modelfull,modelphys,EFTOrder]];
 	
@@ -160,15 +161,14 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 	
 	Do[
 	
-	Echo[processesSorted[[k]],"Computing process: "];
-	Echo[CoeffInteraction[processes[[k]]],"Appearing couplings: "];
-	
 	(*If all appearing couplings are already computed, skip this process*)
 	If[
 		FreeQ[MemberQ[Keys[reduction], #]&/@ 
 				Flatten@(PerturbativeExpand[CoeffInteraction[processes[[k]]]/.RenameCoeff[modelphys],EFTOrder,modelphys]/.Plus->List), False],
-		Echo["Next process"];
 		Continue[];
+		,
+		Echo[processesSorted[[k]],"Computing process: "];
+		Echo[CoeffInteraction[processes[[k]]],"Appearing couplings: "];
 	];
 	
 	matchEqs={};
@@ -184,18 +184,15 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 		
 		ampPhys = ExplicitEFTOrder @ PerturbativeExpand[ampPhys,EFTOrder,modelphys];
 	(*EFT Series*)
-		ampFull = EchoTiming[EFTSeries[ExplicitEFTOrder @ ampFull,EFTOrder],"EFTSeries in ampFull"];
-		ampPhys = EchoTiming[EFTSeries[ampPhys/.reduction,EFTOrder],"EFTSeries in ampPhys and replace previous results"];
+		ampFull = EchoTiming[Factor@ EFTSeriesRational[ExplicitEFTOrder[ampFull],EFTOrder],"EFTSeries in ampFull"];
+		ampPhys = EchoTiming[Factor@ (EFTSeriesRational[ampPhys,EFTOrder]) //.reduction ,"EFTSeries in ampPhys and replace previous results"];
 		
 	(*Computation of rational kinematics*)
 		(*Symbolic physical masses to be replaced with already computed mphys2 at the end*)
 		(*If any of mphys2 is 0, we take advantage of this and put MPhysSymbol to 0 at this stage.
 		Also, if physical masses of two different particles are the same, we put them equal*)
 		masseslist = If[mphys2[#,modelfull]=!=0, MPhysSymbol[#], 0]&/@ processesSorted[[k]];
-		masseslist = masseslist /. Select[
-						Flatten@Replace[(DeleteDuplicates/@GatherBy[masseslist,#/.{MPhysSymbol[f_]:>mphys2[f,modelphys]}&]),
-										{x_,y__}:>(#->x&/@List[y]),2], 
-						Head[#]===Rule &];
+		masseslist = masseslist /. MPhysSymbolEquiv;
 		
 		varsPhys = DeleteDuplicates@Cases[ampPhys,Coeff[___,modelphys],Infinity];
 		nEqs = Max[Values[CountsBy[varsPhys,#[[2]]&]]]; (*Max number of coefficients with same EFTOrder*)
@@ -242,131 +239,17 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 	
 	(*Join all EFT orders of the same coefficient*)
 	reduction = ( # -> EFTSeries[
-		ExplicitEFTOrder@PerturbativeExpand[#,EFTOrder,modelphys]/.reduction,EFTOrder]/.{inv\[CapitalLambda]->1}
+		ExplicitEFTOrder@PerturbativeExpand[#,EFTOrder,modelphys]//.reduction,EFTOrder]/.{inv\[CapitalLambda]->1}
 			)&/@ CoeffList[modelphys];
 			
 	(*Printing the results*)
 	Echo["Showing the reduction"];
-	FormatCoeff[VisibleModel->False,VisibleOrder->False];
-	Print /@ reduction;
-
-	
-Return[reduction]]
-
-
-Options[RedBasis] = {CoefDimensions->{}, Process->{}};
-RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction={}, ampsNumeric},
-
-tIni = SessionTime[];
-	
-	(*Computation of physical poles, residues and propagators*)
-	AllPropagatorAttributes[modelfull,EFTOrder];
-	AllPropagatorAttributes[modelphys,EFTOrder];
-	
-	reduction = Join[reduction, AllMassReduction[modelfull,modelphys,EFTOrder]];
-	
-	(*Get processes and order them with respect to number of particles and a greater number of identical particles*)
-	processes = SortBy[DeleteCases[ProcessList[modelphys],{_,_}], {Length,Last/@Tally[#]&}];
-	(*processes = DeleteCases[ProcessList[modelphys],{_,_}];*)
-	(*Sort each process so that we have first fermions, then vectors and finally scalars*)
-	processesSorted = SortBy[#,Position[{F,V,S},Head[-#/.{-f_:>f}]]&]&/@ processes;
-	
-	(*List of vertices with coefficients appearing in their Feynman rules*)
-	CoeffInteraction=Association@@Cases[M$CouplingMatrices,C[int__] == coeffs_:>{int}->Variables[coeffs]];
-	
-	Do[
-	
-	(*If all appearing couplings are already computed, skip this process*)
-	If[
-		FreeQ[MemberQ[Keys[reduction], #]&/@ 
-				Flatten@(PerturbativeExpand[CoeffInteraction[processes[[k]]]/.RenameCoeff[modelphys],EFTOrder,modelphys]/.Plus->List), False],
-		Continue[];
-	];
-	
-	matchEqs={};
-	(*Computation of amplitudes*)
-		{ampFull, crossingsFull} = AmplitudeComputation[processesSorted[[k]],EFTOrder,modelfull,SeparateCrossings->True];
-		{ampPhys, crossingsPhys} = AmplitudeComputation[processesSorted[[k]],EFTOrder,modelphys,SeparateCrossings->True];
-		
-	(*Change bare masses by physical ones*)
-		ampFull = ampFull/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]}],
-							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]};
-		ampPhys = ampPhys/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]}],
-							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]};
-		
-		ampPhys = ExplicitEFTOrder @ PerturbativeExpand[ampPhys,EFTOrder,modelphys];
-	(*EFT Series*)
-		ampFull = EFTSeries[ExplicitEFTOrder @ ampFull,EFTOrder];
-		ampPhys = EFTSeries[ampPhys/.reduction,EFTOrder];
-		
-	(*Computation of rational kinematics*)
-		(*Symbolic physical masses to be replaced with already computed mphys2 at the end*)
-		(*If any of mphys2 is 0, we take advantage of this and put MPhysSymbol to 0 at this stage.
-		Also, if physical masses of two different particles are the same, we put them equal*)
-		masseslist = If[mphys2[#,modelfull]=!=0, MPhysSymbol[#], 0]&/@ processesSorted[[k]];
-		masseslist = masseslist /. Select[
-						Flatten@Replace[(DeleteDuplicates/@GatherBy[masseslist,#/.{MPhysSymbol[f_]:>mphys2[f,modelphys]}&]),
-										{x_,y__}:>(#->x&/@List[y]),2], 
-						Head[#]===Rule &];
-		
-		varsPhys = DeleteDuplicates@Cases[ampPhys,Coeff[___,modelphys],Infinity];
-		nEqs = Max[Values[CountsBy[varsPhys,#[[2]]&]]]; (*Max number of coefficients with same EFTOrder*)
-		
-		(*First, flue back the full amplitude with all crossings*)
-		ampFull = Quiet@Simplify[Plus@@UnDoCrossings[MomentumExpand@ampFull, crossingsFull], TimeConstraint->{0.01,1}];
-		ampPhys = Quiet@Simplify[Plus@@UnDoCrossings[MomentumExpand@ampPhys, crossingsPhys], TimeConstraint->{0.01,1}];
-		
-		
-		Do[
-			ampsNumeric = SustMomentaOptimized[{ampFull,ampPhys},##,masseslist]&@@(Count[processesSorted[[k]],#,Infinity,Heads->True]&/@{F,V,S});
-			(*ampsNumeric = ampsNumeric /. MapThread[#1->#2&, {masseslist, EFTSeries[Sqrt@mphys2[#,modelfull],EFTOrder]&/@processes[[k]]}];
-			ampsNumeric = EchoTiming[EFTSeries[EchoTiming[ExplicitEFTOrder @ ampsNumeric,"ExplicitEFTOrder"], EFTOrder],"Last EFT Series"];*)
-			matchEqs = Join[matchEqs, MapThread[Equal,Transpose@ampsNumeric]],
-		nEqs];
-		
-		red = SolvePerturbative[ExplicitEFTOrder@matchEqs, varsPhys];
-		
-		(*Symplifying the solution according to the EFT power of the reduced coefficients*)
-		(*This could be achieved with a standard simplify, but due to the huge rational expressions
-		this can last forever. However, by knowing the mass dimensions of the reduced coefficient
-		and the coefficients appearing in the reduction we can perform a much faster Taylor expansion
-		up to the highest power of mass that we can find in such reduction*)
-		maxPowerOfMass = Max/@(Cases[#,Coeff[_,order_,___]:>order,{-2}]/.{}->{0}&/@ Values[red]);
-		coeffPowerOfMass = TrueEFTOrder/@ Keys[red];
-		
-
-		red = MapThread[
-			#1 -> Normal@Series[
-					Expand[#2]/.{MPhysSymbol[a_]:> xxx MPhysSymbol[a], coeff:Coeff[c_,o_,modelphys] :> xxx^(o-TrueEFTOrder[coeff]) coeff},
-					{xxx,0,#3}]&
-				,{Keys[red], Values[red], maxPowerOfMass-coeffPowerOfMass}];
-		
-		reduction = Join[reduction, red/.{xxx->1}//Simplify];
-		,
-		
-	{k,Length[processes]}];
-	
-	(*Replacing physical masses by bare masses assuming the latter are real-valued*)
-	reduction = Assuming[
-		And @@ (#>0&/@ Cases[DownValues[mbare],mbare[_,modelfull],Infinity]),
-
-		reduction/.{MPhysSymbol[a_]:>EFTSeries[Sqrt[mphys2[a,modelfull]],EFTOrder]}
-	];
-	
-	(*Join all EFT orders of the same coefficient*)
-	reduction = ( # -> EFTSeries[
-		ExplicitEFTOrder@PerturbativeExpand[#,EFTOrder,modelphys]/.reduction,EFTOrder]/.{inv\[CapitalLambda]->1}
-			)&/@ CoeffList[modelphys];
-			
-	(*Printing the results*)
-	Echo["Mostrando la reducci\[OAcute]n: "];
 	FormatCoeff[modelfull,"",VisibleModel->False,VisibleOrder->False];
 	FormatCoeff[modelphys,"",VisibleModel->False,VisibleOrder->False];
-	Print["\[Bullet] "<>ToString@StandardForm[#]] &/@ Expand[reduction];
-
-tFin = SessionTime[];
-
-Print["\nTiempo de ejecuci\[OAcute]n: "<>ToString[N[tFin-tIni,4]]<>" s"];
+	Print /@ Expand[reduction];
+	
+	tFin = SessionTime[];
+	Echo[tFin-tIni, "Elapsed time"];
 	
 Return[reduction]]
 
@@ -499,7 +382,7 @@ Bare2PhysMass[field_,EFTOrder_,model_] := Bare2PhysMass[field,EFTOrder,model] = 
 ]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Crossing - related functions*)
 
 
@@ -611,7 +494,7 @@ IsGoodPermutationQ[perm_Cycles,subSets_]:=IsGoodPermutationQ[Level[perm,{2}],sub
 IsGoodPermutationQ[perm_List,subSets_]:=And@@Table[AnyTrue[subSets,SubsetQ[#,perm[[k]]]&],{k,Length[perm]}]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Algebraic Tools*)
 
 
@@ -628,7 +511,7 @@ EFTSeries[A_ +B_,EFTOrder_]:=EFTSeries[A,EFTOrder]+EFTSeries[B,EFTOrder]*)
 EFTSeries[exp_,n_]:=Normal@Series[ExplicitEFTOrder@exp,{inv\[CapitalLambda],0,n-4}]
 
 
-EFTSeriesRational[exp_List,EFTOrder_] := EFTSeriesRational[#,EFTOrder]&/@exp
+(*EFTSeriesRational[exp_List,EFTOrder_] := EFTSeriesRational[#,EFTOrder]&/@exp
 
 EFTSeriesRational[exp_Plus,EFTOrder_]:=Block[{expList=List@@exp,num,den,DenominatorSeries,expnew},
 	num=Numerator/@expList;
@@ -640,7 +523,11 @@ EFTSeriesRational[exp_Plus,EFTOrder_]:=Block[{expList=List@@exp,num,den,Denomina
 	den=(DenominatorSeries@@#)&/@den;
 	expnew=Total[CoefficientList[num*den,inv\[CapitalLambda],EFTOrder-3],Infinity];
 	Return[expnew];
-]
+]*)
+
+
+EFTSeriesRational[exp_List,n_]:=EFTSeriesRational[#,n]&/@exp
+EFTSeriesRational[exp_,n_]:=Total[CoefficientList[Collect[Numerator[#],inv\[CapitalLambda]]EFTSeries[1/Collect[Denominator[#],inv\[CapitalLambda]],n]&@ Together[exp],inv\[CapitalLambda],n-3],{-1}]
 
 
 ExplicitEFTOrder[amp_]:=(amp/.inv\[CapitalLambda]->1)/.{Coeff[c_,order_/;order>4,model___]:>inv\[CapitalLambda]^(order-4 ) Coeff[c,order,model]}

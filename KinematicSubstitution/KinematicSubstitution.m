@@ -185,14 +185,14 @@ SustMomentaOptimized[amp_List,fermions_,vectors_,scalars_,mlist_]:=Module[{eList
 	replaceFunction = MapIndexed[Function[{a,b},a->Slot[b[[1]]]], Keys[listReplacements]];
 	
 	optimizeAmps = Map[Function@@
-		(Experimental`OptimizeExpression[#]//.ProjectorSust//.{Pair[args__]:>Simplify@MDot[args], DiracGamma->pslash, Eps->EpsContract}) /. replaceFunction &,
+		(Experimental`OptimizeExpression[#]//.ProjectorSust//.{ DiracGamma->pslash, Eps->EpsContract}) /. replaceFunction &,
 		amp];
 		
 	(*optimizeAmps = Map[Function@@
 		({#}//.ProjectorSust//.{Pair[args__]:>Simplify@MDot[args], DiracGamma->pslash, Eps->EpsContract})/. replaceFunction &,
 		amp];*)
 	(* We also replace listReplacements again in case OptimizeExpression did something strange *)
-	AppendTo[ampList, Quiet@Simplify[#@@Values[listReplacements] /. listReplacements, TimeConstraint->{0.01,1}] &/@ optimizeAmps],
+	AppendTo[ampList, Quiet@Simplify[#@@Values[listReplacements] /. Pair[args__]:>Simplify@MDot[args] /. listReplacements, TimeConstraint->{0.01,1}] &/@ optimizeAmps],
 	
 	{j,1,Length[eList]}];
 Return[ampList];
