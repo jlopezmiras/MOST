@@ -12,7 +12,7 @@
 BeginPackage["MOST`"];
 
 
-$ContextPath = Join[{"FeynCalc`","FeynArts`","KinematicSubstitution`"}, $ContextPath];
+$ContextPath = Join[{"FeynCalc`","FeynArts`","KinematicSubstitution`"},$ContextPath];
 
 
 (* ::Section:: *)
@@ -102,6 +102,12 @@ Block[{fontfamily="Alegreya SC", bigSize=32, smallSize=30, colorize},
 Begin["`Private`"]
 
 
+N[153/256]
+
+
+RGBColor[1,0.45,0.19]
+
+
 (* ::Section:: *)
 (*Basis Reduction*)
 
@@ -132,6 +138,120 @@ MassReduction[field_, modelfull_, modelphys_, EFTOrder_]:=Module[{massphys,solve
 						
 	Return[massphyssol];
 ]
+
+
+Options[RedBasis] = {CoefDimensions->{}, Process->{}};
+RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction={}, ampsNumeric},
+	
+	(*Computation of physical poles, residues and propagators*)
+	AllPropagatorAttributes[modelfull,EFTOrder];
+	AllPropagatorAttributes[modelphys,EFTOrder];
+	
+	reduction = Join[reduction, AllMassReduction[modelfull,modelphys,EFTOrder]];
+	
+	(*Get processes and order them with respect to number of particles and a greater number of identical particles*)
+	processes = SortBy[DeleteCases[ProcessList[modelphys],{_,_}], {Length,Last/@Tally[#]&}];
+	(*processes = DeleteCases[ProcessList[modelphys],{_,_}];*)
+	(*Sort each process so that we have first fermions, then vectors and finally scalars*)
+	processesSorted = SortBy[#,Position[{F,V,S},Head[-#/.{-f_:>f}]]&]&/@ processes;
+	
+	(*List of vertices with coefficients appearing in their Feynman rules*)
+	CoeffInteraction=Association@@Cases[M$CouplingMatrices,C[int__] == coeffs_:>{int}->Variables[coeffs]];
+	
+	Do[
+	
+	Echo[processesSorted[[k]],"Computing process: "];
+	Echo[CoeffInteraction[processes[[k]]],"Appearing couplings: "];
+	
+	(*If all appearing couplings are already computed, skip this process*)
+	If[
+		FreeQ[MemberQ[Keys[reduction], #]&/@ 
+				Flatten@(PerturbativeExpand[CoeffInteraction[processes[[k]]]/.RenameCoeff[modelphys],EFTOrder,modelphys]/.Plus->List), False],
+		Echo["Next process"];
+		Continue[];
+	];
+	
+	matchEqs={};
+	(*Computation of amplitudes*)
+		{ampFull, crossingsFull} = EchoTiming[AmplitudeComputation[processesSorted[[k]],EFTOrder,modelfull,SeparateCrossings->True],"Amplitude Full"];
+		{ampPhys, crossingsPhys} = EchoTiming[AmplitudeComputation[processesSorted[[k]],EFTOrder,modelphys,SeparateCrossings->True],"Amplitude Phys"];
+		
+	(*Change bare masses by physical ones*)
+		ampFull = ampFull/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]}],
+							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]};
+		ampPhys = ampPhys/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]}],
+							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]};
+		
+		ampPhys = ExplicitEFTOrder @ PerturbativeExpand[ampPhys,EFTOrder,modelphys];
+	(*EFT Series*)
+		ampFull = EchoTiming[EFTSeries[ExplicitEFTOrder @ ampFull,EFTOrder],"EFTSeries in ampFull"];
+		ampPhys = EchoTiming[EFTSeries[ampPhys/.reduction,EFTOrder],"EFTSeries in ampPhys and replace previous results"];
+		
+	(*Computation of rational kinematics*)
+		(*Symbolic physical masses to be replaced with already computed mphys2 at the end*)
+		(*If any of mphys2 is 0, we take advantage of this and put MPhysSymbol to 0 at this stage.
+		Also, if physical masses of two different particles are the same, we put them equal*)
+		masseslist = If[mphys2[#,modelfull]=!=0, MPhysSymbol[#], 0]&/@ processesSorted[[k]];
+		masseslist = masseslist /. Select[
+						Flatten@Replace[(DeleteDuplicates/@GatherBy[masseslist,#/.{MPhysSymbol[f_]:>mphys2[f,modelphys]}&]),
+										{x_,y__}:>(#->x&/@List[y]),2], 
+						Head[#]===Rule &];
+		
+		varsPhys = DeleteDuplicates@Cases[ampPhys,Coeff[___,modelphys],Infinity];
+		nEqs = Max[Values[CountsBy[varsPhys,#[[2]]&]]]; (*Max number of coefficients with same EFTOrder*)
+		
+		(*First, flue back the full amplitude with all crossings*)
+		ampFull = Quiet@Simplify[Plus@@UnDoCrossings[MomentumExpand@ampFull, crossingsFull], TimeConstraint->{0.01,1}];
+		ampPhys = Quiet@Simplify[Plus@@UnDoCrossings[MomentumExpand@ampPhys, crossingsPhys], TimeConstraint->{0.01,1}];
+		
+		Do[
+			ampsNumeric = EchoTiming[SustMomentaOptimized[{ampFull,ampPhys},##,masseslist]&@@(Count[processesSorted[[k]],#,Infinity,Heads->True]&/@{F,V,S}),"Substitution Momenta"];
+			(*ampsNumeric = ampsNumeric /. MapThread[#1->#2&, {masseslist, EFTSeries[Sqrt@mphys2[#,modelfull],EFTOrder]&/@processes[[k]]}];
+			ampsNumeric = EchoTiming[EFTSeries[EchoTiming[ExplicitEFTOrder @ ampsNumeric,"ExplicitEFTOrder"], EFTOrder],"Last EFT Series"];*)
+			matchEqs = Join[matchEqs, MapThread[Equal,Transpose@ampsNumeric]],
+		nEqs];
+		
+		red = EchoTiming[SolvePerturbative[ExplicitEFTOrder@matchEqs, varsPhys],"Solving system"];
+		
+		(*Symplifying the solution according to the EFT power of the reduced coefficients*)
+		(*This could be achieved with a standard simplify, but due to the huge rational expressions
+		this can last forever. However, by knowing the mass dimensions of the reduced coefficient
+		and the coefficients appearing in the reduction we can perform a much faster Taylor expansion
+		up to the highest power of mass that we can find in such reduction*)
+		maxPowerOfMass = Max/@(Cases[#,Coeff[_,order_,___]:>order,{-2}]/.{}->{0}&/@ Values[red]);
+		coeffPowerOfMass = TrueEFTOrder/@ Keys[red];
+		
+
+		red = MapThread[
+			#1 -> Normal@Series[
+					Expand[#2]/.{MPhysSymbol[a_]:> xxx MPhysSymbol[a], coeff:Coeff[c_,o_,modelphys] :> xxx^(o-TrueEFTOrder[coeff]) coeff},
+					{xxx,0,#3}]&
+				,{Keys[red], Values[red], maxPowerOfMass-coeffPowerOfMass}];
+		
+		reduction = Echo@Join[reduction, red/.{xxx->1}//Simplify];
+		,
+		
+	{k,Length[processes]}];
+	
+	(*Replacing physical masses by bare masses assuming the latter are real-valued*)
+	reduction = Assuming[
+		And @@ (#>0&/@ Cases[DownValues[mbare],mbare[_,modelfull],Infinity]),
+
+		reduction/.{MPhysSymbol[a_]:>EFTSeries[Sqrt[mphys2[a,modelfull]],EFTOrder]}
+	];
+	
+	(*Join all EFT orders of the same coefficient*)
+	reduction = ( # -> EFTSeries[
+		ExplicitEFTOrder@PerturbativeExpand[#,EFTOrder,modelphys]/.reduction,EFTOrder]/.{inv\[CapitalLambda]->1}
+			)&/@ CoeffList[modelphys];
+			
+	(*Printing the results*)
+	Echo["Showing the reduction"];
+	FormatCoeff[VisibleModel->False,VisibleOrder->False];
+	Print /@ reduction;
+
+	
+Return[reduction]]
 
 
 Options[RedBasis] = {CoefDimensions->{}, Process->{}};
@@ -239,14 +359,14 @@ tIni = SessionTime[];
 			)&/@ CoeffList[modelphys];
 			
 	(*Printing the results*)
-	Echo["Showing the reduction: "];
+	Echo["Mostrando la reducci\[OAcute]n: "];
 	FormatCoeff[modelfull,"",VisibleModel->False,VisibleOrder->False];
 	FormatCoeff[modelphys,"",VisibleModel->False,VisibleOrder->False];
 	Print["\[Bullet] "<>ToString@StandardForm[#]] &/@ Expand[reduction];
 
 tFin = SessionTime[];
 
-Print["\nElapsed time: "<>ToString[N[tFin-tIni,4]]<>" s"];
+Print["\nTiempo de ejecuci\[OAcute]n: "<>ToString[N[tFin-tIni,4]]<>" s"];
 	
 Return[reduction]]
 
@@ -382,6 +502,26 @@ Bare2PhysMass[field_,EFTOrder_,model_] := Bare2PhysMass[field,EFTOrder,model] = 
 (* ::Section:: *)
 (*Crossing - related functions*)
 
+
+FindCrossings[graphs_]:=Block[{graphsIDordered,graphWPos,crossedDiags,vertsOrder,cycles,nParticles,crossingPerms,numCrossedDiags},
+	
+	(*Order in a canonical way id of internal vertices*)
+		graphsIDordered=ReorderVerticesID/@graphs;
+	
+	(*Adding the position of the diagram {{diag1,1},{diag2,2}...}*)
+		graphWPos=MapIndexed[{#1,First[#2]}&,List@@graphsIDordered];
+	
+	(*Finding crossedDiags and the number of their positions in graphs*)
+		{crossedDiags,numCrossedDiags}=Transpose[Transpose/@GatherBy[graphWPos,InternalLines[#[[1]]]&]];
+	
+	(*Finding the permutation crossing*)
+		vertsOrder=internalVertsOrder/@crossedDiags;
+		cycles=Table[FindPermutation[vertsOrder[[k]][[1]],#]&/@vertsOrder[[k]],{k,Length[vertsOrder]}];
+		nParticles=Length@ExternalLines[graphsIDordered[[1]]];
+		crossingPerms=Table[Permute[Range[nParticles],#]&/@cycles[[k]],{k,Length[cycles]}];
+
+	Return[{TopologyList@@(First/@crossedDiags),crossingPerms,numCrossedDiags}];
+]
 
 FindCrossings[graphs_,possibleCrossings_]:=Block[{graphsIDordered,graphWPos,crossedDiags,vertsOrder,cycles,nParticles,crossingPerms,numCrossedDiags},
 	
@@ -684,6 +824,177 @@ SubscriptBox[\(c\), \(subscript\)], \("\<(\>" <> ToString[o] <> "\<)\>"\)]\);
 	]]]
 ]
 
+
+
+(* ::Section:: *)
+(*Old functions*)
+
+
+Options[RedBasisOld] = {CoefDimensions->{}, Process->{}};
+RedBasisOld[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction={}, ampsNumeric},
+	
+	(*Computation of physical poles, residues and propagators*)
+	AllPropagatorAttributes[modelfull,EFTOrder];
+	AllPropagatorAttributes[modelphys,EFTOrder];
+	
+	reduction = Join[reduction, AllMassReduction[modelfull,modelphys,EFTOrder]];
+	
+	(*Get processes and order them with respect to number of particles and a greater number of identical particles*)
+	processes = SortBy[DeleteCases[ProcessList[modelphys],{_,_}], {Length,Last/@Tally[#]&}];
+	processes = DeleteCases[ProcessList[modelphys],{_,_}];
+	(*Sort each process so that we have first fermions, then vectors and finally scalars*)
+	processesSorted = SortBy[#,Position[{F,V,S},Head[-#/.{-f_:>f}]]&]&/@ processes;
+	
+	(*List of vertices with coefficients appearing in their Feynman rules*)
+	CoeffInteraction=Association@@Cases[M$CouplingMatrices,C[int__] == coeffs_:>{int}->Variables[coeffs]];
+	
+	Do[
+	
+	Echo[processesSorted[[k]],"Computing process: "];
+	Echo[CoeffInteraction[processes[[k]]],"Appearing couplings: "];
+	
+	(*If all appearing couplings are already computed, skip this process*)
+	If[
+		FreeQ[MemberQ[Keys[reduction], #]&/@ 
+				Flatten@(PerturbativeExpand[CoeffInteraction[processes[[k]]]/.RenameCoeff[modelphys],EFTOrder,modelphys]/.Plus->List), False],
+		Echo["Next process"];
+		Continue[];
+	];
+	
+	matchEqs={};
+	(*Computation of amplitudes*)
+		{ampFullStructs,ampFullKins} = EchoTiming[AmplitudeComputation[processesSorted[[k]],EFTOrder,modelfull,SeparateKinStructs->True],"Amplitude Full"];
+		{ampPhysStructs,ampPhysKins} = EchoTiming[AmplitudeComputation[processesSorted[[k]],EFTOrder,modelphys,SeparateKinStructs->True],"Amplitude Phys"];
+		
+	(*Evaluation of kinematical structures with arbitrary kinematical arguments*)
+		ampFullStructs = #@@(kinArg/@Range[NumArgs[#]])&/@ ampFullStructs;
+		ampPhysStructs = #@@(kinArg/@Range[NumArgs[#]])&/@ ampPhysStructs;
+		
+	(*Change bare masses by physical ones*)
+		ampFullStructs = ampFullStructs/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]}],
+							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]};
+		ampPhysStructs = ampPhysStructs/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]}],
+							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]};
+		
+		ampPhysStructs = ExplicitEFTOrder @ PerturbativeExpand[ampPhysStructs,EFTOrder,modelphys];
+	(*EFT Series*)
+		ampFullStructs = EchoTiming[EFTSeries[ExplicitEFTOrder @ ampFullStructs,EFTOrder],"EFTSeries in ampFull"];
+		ampPhysStructs = EchoTiming[EFTSeries[ampPhysStructs/.reduction,EFTOrder],"EFTSeries in ampPhys and replace previous results"];
+		
+	(*Glue back the full amplitude*)
+		ampFull = Plus@@RecoverKinematics[Function@@{#/.{kinArg->Slot}}&/@ampFullStructs, ampFullKins] //MomentumExpand;
+		ampPhys = Plus@@RecoverKinematics[Function@@{#/.{kinArg->Slot}}&/@ampPhysStructs, ampPhysKins] //MomentumExpand;
+		
+		ampFull = Quiet@Simplify[ampFull,TimeConstraint->{0.01,1}];
+		ampPhys = Quiet@Simplify[ampPhys,TimeConstraint->{0.01,1}];
+		
+	(*Computation of rational kinematics*)
+		(*Symbolic physical masses to be replaced with already computed mphys2 at the end*)
+		(*If any of mphys2 is 0, we take advantage of this and put MPhysSymbol to 0 at this stage.
+		Also, if physical masses of two different particles are the same, we put them equal*)
+		masseslist = If[mphys2[#,modelfull]=!=0, MPhysSymbol[#], 0]&/@ processesSorted[[k]];
+		masseslist = masseslist /. Select[
+						Flatten@Replace[(DeleteDuplicates/@GatherBy[masseslist,#/.{MPhysSymbol[f_]:>mphys2[f,modelphys]}&]),
+										{x_,y__}:>(#->x&/@List[y]),2], 
+						Head[#]===Rule &];
+		
+		varsPhys = DeleteDuplicates@Cases[ampPhys,Coeff[___,modelphys],Infinity];
+		nEqs = Max[Values[CountsBy[varsPhys,#[[2]]&]]]; (*Max number of coefficients with same EFTOrder*)
+		Do[
+			ampsNumeric = EchoTiming[SustMomentaOptimized[{ampFull,ampPhys},##,masseslist]&@@(Count[processesSorted[[k]],#,Infinity,Heads->True]&/@{F,V,S}),"Substitution Momenta"];
+			(*ampsNumeric = ampsNumeric /. MapThread[#1->#2&, {masseslist, EFTSeries[Sqrt@mphys2[#,modelfull],EFTOrder]&/@processes[[k]]}];
+			ampsNumeric = EchoTiming[EFTSeries[EchoTiming[ExplicitEFTOrder @ ampsNumeric,"ExplicitEFTOrder"], EFTOrder],"Last EFT Series"];*)
+			matchEqs = Join[matchEqs, MapThread[Equal,Transpose@ampsNumeric]],
+		nEqs];
+		
+		red = EchoTiming[SolvePerturbative[ExplicitEFTOrder@matchEqs, varsPhys],"Solving system"];
+		
+		(*Symplifying the solution according to the EFT power of the reduced coefficients*)
+		(*This could be achieved with a standard simplify, but due to the huge rational expressions
+		this can last forever. However, by knowing the mass dimensions of the reduced coefficient
+		and the coefficients appearing in the reduction we can perform a much faster Taylor expansion
+		up to the highest power of mass that we can find in such reduction*)
+		maxPowerOfMass = Max/@(Cases[#,Coeff[_,order_,___]:>order,{-2}]/.{}->{0}&/@ Values[red]);
+		coeffPowerOfMass = TrueEFTOrder/@ Keys[red];
+		
+		red = MapThread[
+			#1 -> Normal@Series[Expand[#2]/.{MPhysSymbol[a_]:> xxx MPhysSymbol[a]},{xxx,0,#3}]&
+				,{Keys[red], Values[red], maxPowerOfMass-coeffPowerOfMass}];
+		
+		reduction = Echo@Join[reduction, red/.{xxx->1}//Simplify];
+		,
+		
+	{k,Length[processes]}];
+	
+	(*Replacing physical masses by bare masses assuming the latter are real-valued*)
+	reduction = Assuming[
+		And @@ (#>0&/@ Cases[DownValues[mbare],mbare[_,modelfull],Infinity]),
+
+		reduction/.{MPhysSymbol[a_]:>EFTSeries[Sqrt[mphys2[a,modelfull]],EFTOrder]}
+	];
+	
+	(*Join all EFT orders of the same coefficient*)
+	reduction = ( # -> EFTSeries[
+		ExplicitEFTOrder@PerturbativeExpand[#,EFTOrder,modelphys]/.reduction,EFTOrder]/.{inv\[CapitalLambda]->1}
+			)&/@ CoeffList[modelphys];
+			
+	(*Printing the results*)
+	Echo["Showing the reduction"];
+	FormatCoeff[VisibleModel->False,VisibleOrder->False];
+	Print /@ reduction;
+
+	
+Return[reduction]]
+
+
+Options[AmplitudeComputationOld]={SeparateKinStructs->False};
+AmplitudeComputationOld[process_,EFTOrder_,model_,OptionsPattern[]]:=Module[{fields,nParticles,momentaList,adjacencies,topos,diags,amp,ampStructs,ampKins,PropSust},
+
+	fields = DeleteDuplicatesBy[process,Abs];
+
+	nParticles = Length[process];
+	momentaList = Symbol["P"<>ToString[#]]&/@Range[nParticles];
+	
+	(*Trying to compute topologies with the needed adjacencies*)
+	adjacencies = DeleteCases[Length/@ProcessList[model],x_/;x<=2];
+	topos = CreateTopologies[0,nParticles->0,Adjacencies->adjacencies];
+	
+	diags = Quiet@InsertFields[topos,process->{},InsertionLevel->{Particles},Model->model,GenericModel->model];
+	amp = FCFAConvert[CreateFeynAmp[diags],IncomingMomenta->momentaList,List->False]/.RenameCoeff[model];
+	amp = Contract[amp];
+	amp = ExplicitEFTOrder[amp];
+	
+	(*Detect different kinematic structures to work only with some few terms*)
+	{ampStructs,ampKins} = IdentifyKinematics[amp/.{FeynAmpDenominator[PD[P_,m_]] :> DenProp[Pair[P,P],m^2]}, EvaluateTerms->kinArg];
+	
+	ampStructs = Sum[inv\[CapitalLambda]^k Coefficient[#,inv\[CapitalLambda],k],{k,0,EFTOrder-4}]&/@ampStructs;
+	
+	(*Getting propagator attributes*)
+	GetInternalMasses[model];
+	GetExternalMasses[model];
+	If[MatchQ[mphys2[#,model],mphys2[_,_]],
+		mphys2[#,model]=mbare[#,model]^2;
+		Z[#,model]=1;
+		Prop[#,model][p_]:=1/(Pair[Momentum[p],Momentum[p]]-mphys2[#,model])
+	]&/@fields;
+	
+	(*!!!!!!!!!!!!!!!!!!!!
+	Pedir usuario que ponga distintas masas bare para cada field*) 
+	PropSust = (DenProp[p2_,mInternal[#,model]^2]:>EFTSeries[Prop[#,model][p2],EFTOrder])&/@ GetFields[model];
+	
+	ampStructs = EFTSeries[Times@@(Z[#,model]^(1/2)&/@process), EFTOrder] ampStructs /. PropSust;
+	
+	ampStructs = Sum[inv\[CapitalLambda]^k Coefficient[#,inv\[CapitalLambda],k],{k,0,EFTOrder-4}]&/@ ampStructs;
+	
+	(*Set ampStructs as a pure function again*)
+	ampStructs = Function@@{#/.{kinArg->Slot}}&/@ampStructs;
+	
+	If[OptionValue[SeparateKinStructs]===False, Return[Collect[Plus@@RecoverKinematics[ampStructs,ampKins],inv\[CapitalLambda]]]];
+	
+	Return[{ampStructs,ampKins}];
+
+Return[amp];
+]
 
 
 End[];
