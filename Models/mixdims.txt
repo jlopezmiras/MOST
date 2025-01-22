@@ -1,0 +1,395 @@
+(* Renormalisable terms *)
+(***************************************************************************************************)
+OH2dim2   := ExpandIndices[aH2dim2 Phibar[i1] Phi[i1]]
+OH2dim4   := ExpandIndices[aH2dim4 DC[Phibar[i1],mu] DC[Phi[i1],mu]]
+OH4dim4   := ExpandIndices[-aH4dim4 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2]]
+
+
+(* Dimension-six terms *)
+(***************************************************************************************************)
+OHWtBdim6 := ExpandIndices[aHWtBdim6 Dual[FS][Wi,mu,nu,j1] FS[B,mu,nu] Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2]]
+OHWBdim6  := ExpandIndices[aHWBdim6 FS[Wi,mu,nu,j1] FS[B,mu,nu] Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2]]
+OHBtdim6  := ExpandIndices[aHBtdim6 Dual[FS][B,mu,nu] FS[B,mu,nu] Phibar[i1] Phi[i1]]
+OHBdim6   := ExpandIndices[aHBdim6  FS[B,mu,nu] FS[B,mu,nu] Phibar[i1] Phi[i1]]
+OHWtdim6  := ExpandIndices[aHWtdim6 Dual[FS][Wi,mu,nu,j1] FS[Wi,mu,nu,j1] Phibar[i1] Phi[i1]]
+OHWdim6   := ExpandIndices[aHWdim6  FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1] Phibar[i1] Phi[i1]]
+OHGtdim6  := ExpandIndices[aHGtdim6 Dual[FS][G,mu,nu,c1] FS[G,mu,nu,c1] Phibar[i1] Phi[i1]]
+OHGdim6   := ExpandIndices[aHGdim6  FS[G,mu,nu,c1] FS[G,mu,nu,c1] Phibar[i1] Phi[i1]]
+OHDDdim6  := ExpandIndices[aHDDdim6 Phibar[i1] Phi[i1] DC[DC[Phibar[i2] Phi[i2],mu],mu] ]
+OHDdim6   := ExpandIndices[aHDdim6 Phibar[i1] DC[Phi[i1],mu] DC[Phibar[i2],mu] Phi[i2] ]
+OHdim6    := ExpandIndices[aHdim6 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] Phibar[i3] Phi[i3]]
+(* Redundant *)
+OWDHdim6  := ExpandIndices[rWDHdim6 DC[FS[Wi,mu,nu,j1],nu] (I Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]- I DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2]) ]
+OBDHdim6  := ExpandIndices[rBDHdim6 DC[FS[B,mu,nu],nu] (I Phibar[i1] DC[Phi[i1],mu]- I DC[Phibar[i1],mu] Phi[i1])]
+ODH2dim6  := ExpandIndices[rDH2dim6 DC[DC[Phibar[i1],mu],mu] DC[DC[Phi[i1],nu],nu]]
+OHDpdim6  := ExpandIndices[rHDpdim6 (Phibar[i1] Phi[i1]) DC[Phibar[i2],mu] DC[Phi[i2],mu]]
+OHDppdim6 := ExpandIndices[rHDppdim6 (Phibar[i1] Phi[i1]) DC[(I Phibar[i2] DC[Phi[i2],mu]-I DC[Phibar[i2],mu] Phi[i2]),mu]]
+
+
+
+(* H^8 *)
+(***************************************************************************************************)
+OH8       := ExpandIndices[aH8 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] Phibar[i3] Phi[i3] Phibar[i4] Phi[i4]]
+
+(* H^4 D^4 *)
+(***************************************************************************************************)
+OH41      := ExpandIndices[aH41 DC[Phibar[i1],mu] DC[Phi[i1],nu] DC[Phibar[i2],nu] DC[Phi[i2],mu]]
+OH42      := ExpandIndices[aH42 DC[Phibar[i1],mu] DC[Phi[i1],nu] DC[Phibar[i2],mu] DC[Phi[i2],nu]]
+OH43      := ExpandIndices[aH43 DC[Phibar[i1],mu] DC[Phi[i1],mu] DC[Phibar[i2],nu] DC[Phi[i2],nu]]
+(* Redundant *)
+OH44      := ExpandIndices[rH44 (Phibar[i1] DC[DC[Phi[i1],mu],mu] + DC[DC[Phibar[i1],mu],mu] Phi[i1]) DC[Phibar[i2],nu] DC[Phi[i2],nu]]
+OH45      := ExpandIndices[rH45 I (Phibar[i1] DC[DC[Phi[i1],mu],mu]-DC[DC[Phibar[i1],mu],mu] Phi[i1]) DC[Phibar[i2],nu] DC[Phi[i2],nu]]
+OH46      := ExpandIndices[rH46 (DC[Phibar[i1],nu] Phi[i1] DC[DC[Phibar[i2],mu],mu] DC[Phi[i2],nu] + DC[Phibar[i2],nu] DC[DC[Phi[i2],mu],mu] Phibar[i1] DC[Phi[i1],nu])]
+OH47      := ExpandIndices[rH47 I (DC[Phibar[i1],nu] Phi[i1] DC[DC[Phibar[i2],mu],mu] DC[Phi[i2],nu] - DC[Phibar[i2],nu] DC[DC[Phi[i2],mu],mu] Phibar[i1] DC[Phi[i1],nu])]
+OH48      := ExpandIndices[rH48 (DC[DC[Phibar[i1],mu],mu] Phi[i1] DC[DC[Phibar[i2],nu],nu] Phi[i2] + Phibar[i1] DC[DC[Phi[i1],mu],mu] Phibar[i2] DC[DC[Phi[i2],nu],nu])]
+OH49      := ExpandIndices[rH49 I (DC[DC[Phibar[i1],mu],mu] Phi[i1] DC[DC[Phibar[i2],nu],nu] Phi[i2] - Phibar[i1] DC[DC[Phi[i1],mu],mu] Phibar[i2] DC[DC[Phi[i2],nu],nu])]
+OH410     := ExpandIndices[rH410 DC[DC[Phibar[i1],mu],mu] DC[DC[Phi[i1],nu],nu] Phibar[i2] Phi[i2]]
+OH411     := ExpandIndices[rH411 Phibar[i1] DC[DC[Phi[i1],mu],mu] DC[DC[Phibar[i2],nu],nu] Phi[i2]]
+OH412     := ExpandIndices[rH412 (DC[Phibar[i1],mu] Phi[i1] DC[Phibar[i2],mu] DC[DC[Phi[i2],nu],nu] + DC[DC[Phibar[i2],nu],nu] DC[Phi[i2],mu] Phibar[i1] DC[Phi[i1],mu])]
+OH413     := ExpandIndices[rH413 I (DC[Phibar[i1],mu] Phi[i1] DC[Phibar[i2],mu] DC[DC[Phi[i2],nu],nu] - DC[DC[Phibar[i2],nu],nu] DC[Phi[i2],mu] Phibar[i1] DC[Phi[i1],mu])]
+
+(* H^2 D^6 *)
+(***************************************************************************************************)
+(* Redundant *)
+OH2       := -ExpandIndices[rH2 (DC[DC[DC[Phibar[i1],mu],mu],rho] DC[DC[DC[Phi[i1],nu],rho],nu] + DC[DC[DC[Phibar[i1],nu],rho],nu] DC[DC[DC[Phi[i1],mu],mu],rho])]
+
+(* H^6 D^2 *)
+(***************************************************************************************************)
+OH61      := ExpandIndices[aH61 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] DC[Phibar[i3],mu] DC[Phi[i3],mu]]
+OH62      := ExpandIndices[aH62 Phibar[i1] Phi[i1] Phibar[i2] 2 Ta[j1,i2,i3] Phi[i3] DC[Phibar[i4],mu] 2 Ta[j1,i4,i5] DC[Phi[i5],mu]]
+(* Redundant *)
+OH63      := ExpandIndices[rH63 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] (Phibar[i3] DC[DC[Phi[i3],mu],mu] + DC[DC[Phibar[i3],mu],mu] Phi[i3])]
+OH64      := ExpandIndices[rH64 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] DC[Phibar[i3] I DC[Phi[i3],mu]-DC[Phibar[i3],mu] I Phi[i3],mu]]
+
+(* X^2 H^4 *)
+(***************************************************************************************************)
+OG2H41    := ExpandIndices[aG2H41 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] FS[G,mu,nu,c1] FS[G,mu,nu,c1]]
+OG2H42    := ExpandIndices[aG2H42 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] FS[G,mu,nu,c1] Dual[FS][G,mu,nu,c1]]
+OW2H41    := ExpandIndices[aW2H41 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1]]
+OW2H42    := ExpandIndices[aW2H42 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] Dual[FS][Wi,mu,nu,j1] FS[Wi,mu,nu,j1]]
+OW2H43    := ExpandIndices[aW2H43 Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] Phibar[i3] 2 Ta[j2,i3,i4] Phi[i4] FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j2]]
+OW2H44    := ExpandIndices[aW2H44 Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] Phibar[i3] 2 Ta[j2,i3,i4] Phi[i4] Dual[FS][Wi,mu,nu,j1] FS[Wi,mu,nu,j2]]
+OWBH41    := ExpandIndices[aWBH41 Phibar[i1] Phi[i1] Phibar[i2] 2 Ta[j1,i2,i3] Phi[i3] FS[Wi,mu,nu,j1] FS[B,mu,nu]]
+OWBH42    := ExpandIndices[aWBH42 Phibar[i1] Phi[i1] Phibar[i2] 2 Ta[j1,i2,i3] Phi[i3] Dual[FS][Wi,mu,nu,j1] FS[B,mu,nu]]
+OB2H41    := ExpandIndices[aB2H41 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] FS[B,mu,nu] FS[B,mu,nu]]
+OB2H42    := ExpandIndices[aB2H42 Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] Dual[FS][B,mu,nu] FS[B,mu,nu]]
+
+(* X H^4 D^2*)
+(***************************************************************************************************)
+OWH4D21   := ExpandIndices[aWH4D21 I Phibar[i1] Phi[i1] DC[Phibar[i2],mu] 2 Ta[j1,i2,i3] DC[Phi[i3],nu] FS[Wi,mu,nu,j1]]
+OWH4D22   := ExpandIndices[aWH4D22 I Phibar[i1] Phi[i1] DC[Phibar[i2],mu] 2 Ta[j1,i2,i3] DC[Phi[i3],nu] Dual[FS][Wi,mu,nu,j1]]
+OWH4D23   := ExpandIndices[aWH4D23 I Eps[j1,j2,j3] Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] DC[Phibar[i3],mu] 2 Ta[j2,i3,i4] DC[Phi[i4],nu] FS[Wi,mu,nu,j3]]
+OWH4D24   := ExpandIndices[aWH4D24 I Eps[j1,j2,j3] Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] DC[Phibar[i3],mu] 2 Ta[j2,i3,i4] DC[Phi[i4],nu] Dual[FS][Wi,mu,nu,j3]]
+OBH4D21   := ExpandIndices[aBH4D21 I Phibar[i1] Phi[i1] DC[Phibar[i2],mu] DC[Phi[i2],nu] FS[B,mu,nu]]
+OBH4D22   := ExpandIndices[aBH4D22 I Phibar[i1] Phi[i1] DC[Phibar[i2],mu] DC[Phi[i2],nu] Dual[FS][B,mu,nu]]
+(* Redundant *)
+OWH4D25   := ExpandIndices[rWH4D25 Phibar[i1] Phi[i1] (DC[Phibar[i2],mu] 2 Ta[j1,i2,i3] Phi[i3] + Phibar[i3] 2 Ta[j1,i3,i2] DC[Phi[i2],mu]) DC[FS[Wi,mu,nu,j1],nu]]
+OWH4D26   := ExpandIndices[rWH4D26 I Phibar[i1] Phi[i1] (DC[Phibar[i2],mu] 2 Ta[j1,i2,i3] Phi[i3] - Phibar[i3] 2 Ta[j1,i3,i2] DC[Phi[i2],mu]) DC[FS[Wi,mu,nu,j1],nu]]
+OWH4D27   := ExpandIndices[rWH4D27 Eps[j1,j2,j3] DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2] Phibar[i3] 2 Ta[j2,i3,i4] DC[Phi[i4],nu] FS[Wi,mu,nu,j3]]
+OBH4D23   := ExpandIndices[rBH4D23 I Phibar[i1] Phi[i1] DC[FS[B,mu,nu],nu] (DC[Phibar[i2],mu] Phi[i2] - Phibar[i2] DC[Phi[i2],mu])]
+
+(* X^2 H^2 D^2 *)
+(***************************************************************************************************)
+OG2H2D21  := ExpandIndices[aG2H2D21 DC[Phibar[i1],mu] DC[Phi[i1],nu] FS[G,mu,rho,c1] FS[G,nu,rho,c1]]
+OG2H2D22  := ExpandIndices[aG2H2D22 DC[Phibar[i1],mu] DC[Phi[i1],mu] FS[G,nu,rho,c1] FS[G,nu,rho,c1]]
+OG2H2D23  := ExpandIndices[aG2H2D23 DC[Phibar[i1],mu] DC[Phi[i1],mu] FS[G,nu,rho,c1] Dual[FS][G,nu,rho,c1]]
+OW2H2D21  := ExpandIndices[aW2H2D21 DC[Phibar[i1],mu] DC[Phi[i1],nu] FS[Wi,mu,rho,j1] FS[Wi,nu,rho,j1]]
+OW2H2D22  := ExpandIndices[aW2H2D22 DC[Phibar[i1],mu] DC[Phi[i1],mu] FS[Wi,nu,rho,j1] FS[Wi,nu,rho,j1]]
+OW2H2D23  := ExpandIndices[aW2H2D23 DC[Phibar[i1],mu] DC[Phi[i1],mu] FS[Wi,nu,rho,j1] Dual[FS][Wi,nu,rho,j1]]
+OW2H2D24  := ExpandIndices[aW2H2D24 I Eps[j1,j2,j3] DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] FS[Wi,mu,rho,j2] FS[Wi,nu,rho,j3]]
+OW2H2D25  := ExpandIndices[aW2H2D25 Eps[j1,j2,j3] DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] (FS[Wi,mu,rho,j2] Dual[FS][Wi,nu,rho,j3] - Dual[FS][Wi,mu,rho,j2] FS[Wi,nu,rho,j3])]
+OW2H2D26  := ExpandIndices[aW2H2D26 I Eps[j1,j2,j3] DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] (FS[Wi,mu,rho,j2] Dual[FS][Wi,nu,rho,j3] + Dual[FS][Wi,mu,rho,j2] FS[Wi,nu,rho,j3])]
+OWBH2D21  := ExpandIndices[aWBH2D21 DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],mu] FS[B,nu,rho] FS[Wi,nu,rho,j1]]
+OWBH2D22  := ExpandIndices[aWBH2D22 DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],mu] FS[B,nu,rho] Dual[FS][Wi,nu,rho,j1]]
+OWBH2D23  := ExpandIndices[aWBH2D23 I DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] (FS[B,mu,rho] FS[Wi,nu,rho,j1] - FS[B,nu,rho] FS[Wi,mu,rho,j1])]
+OWBH2D24  := ExpandIndices[aWBH2D24 DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] (FS[B,mu,rho] FS[Wi,nu,rho,j1] + FS[B,nu,rho] FS[Wi,mu,rho,j1])]
+OWBH2D25  := ExpandIndices[aWBH2D25 I DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] (FS[B,mu,rho] Dual[FS][Wi,nu,rho,j1] - FS[B,nu,rho] Dual[FS][Wi,mu,rho,j1])]
+OWBH2D26  := ExpandIndices[aWBH2D26 DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] (FS[B,mu,rho] Dual[FS][Wi,nu,rho,j1] + FS[B,nu,rho] Dual[FS][Wi,mu,rho,j1])]
+OB2H2D21  := ExpandIndices[aB2H2D21 DC[Phibar[i1],mu] DC[Phi[i1],nu] FS[B,mu,rho] FS[B,nu,rho]]
+OB2H2D22  := ExpandIndices[aB2H2D22 DC[Phibar[i1],mu] DC[Phi[i1],mu] FS[B,nu,rho] FS[B,nu,rho]]
+OB2H2D23  := ExpandIndices[aB2H2D23 DC[Phibar[i1],mu] DC[Phi[i1],mu] FS[B,nu,rho] Dual[FS][B,nu,rho]]
+(* Redundant *)
+OG2H2D24  := ExpandIndices[rG2H2D24 (DC[Phibar[i1],mu] Phi[i1] + Phibar[i1] DC[Phi[i1],mu]) DC[FS[G,mu,rho,c1],nu] FS[G,nu,rho,c1]]
+OG2H2D25  := ExpandIndices[rG2H2D25 I (Phibar[i1] DC[DC[Phi[i1],nu],mu] - DC[DC[Phibar[i1],nu],mu] Phi[i1]) FS[G,mu,rho,c1] FS[G,nu,rho,c1]]
+OG2H2D26  := ExpandIndices[rG2H2D26 Phibar[i1] Phi[i1] DC[DC[FS[G,mu,rho,c1],nu],mu] FS[G,nu,rho,c1]]
+OG2H2D27  := ExpandIndices[rG2H2D27 I (Phibar[i1] DC[Phi[i1],nu] - DC[Phibar[i1],nu] Phi[i1]) DC[FS[G,mu,rho,c1],mu] FS[G,nu,rho,c1]]
+OG2H2D28  := ExpandIndices[rG2H2D28 (Phibar[i1] DC[Phi[i1],nu] + DC[Phibar[i1],nu] Phi[i1]) DC[FS[G,mu,rho,c1],mu] FS[G,nu,rho,c1]]
+OG2H2D29  := ExpandIndices[rG2H2D29 (Phibar[i1] DC[DC[Phi[i1],mu],mu] + DC[DC[Phibar[i1],mu],mu] Phi[i1]) FS[G,nu,rho,c1] Dual[FS][G,nu,rho,c1]]
+OG2H2D210 := ExpandIndices[rG2H2D210 I (Phibar[i1] DC[DC[Phi[i1],mu],mu] - DC[DC[Phibar[i1],mu],mu] Phi[i1]) FS[G,nu,rho,c1] Dual[FS][G,nu,rho,c1]]
+OG2H2D211 := ExpandIndices[rG2H2D211 (Phibar[i1] DC[Phi[i1],nu] + DC[Phibar[i1],nu] Phi[i1]) DC[FS[G,mu,rho,c1],mu] Dual[FS][G,nu,rho,c1]]
+OG2H2D212 := ExpandIndices[rG2H2D212 I (Phibar[i1] DC[Phi[i1],nu] - DC[Phibar[i1],nu] Phi[i1]) DC[FS[G,mu,rho,c1],mu] Dual[FS][G,nu,rho,c1]]
+OB2H2D24  := ExpandIndices[rB2H2D24 (DC[Phibar[i1],mu] Phi[i1] + Phibar[i1] DC[Phi[i1],mu]) DC[FS[B,mu,rho],nu] FS[B,nu,rho]]
+OB2H2D25  := ExpandIndices[rB2H2D25 I (Phibar[i1] DC[DC[Phi[i1],nu],mu] - DC[DC[Phibar[i1],nu],mu] Phi[i1]) FS[B,mu,rho] FS[B,nu,rho]]
+OB2H2D26  := ExpandIndices[rB2H2D26 Phibar[i1] Phi[i1] DC[DC[FS[B,mu,rho],nu],mu] FS[B,nu,rho]]
+OB2H2D27  := ExpandIndices[rB2H2D27 I (Phibar[i1] DC[Phi[i1],nu] - DC[Phibar[i1],nu] Phi[i1]) DC[FS[B,mu,rho],mu] FS[B,nu,rho]]
+OB2H2D28  := ExpandIndices[rB2H2D28 (Phibar[i1] DC[Phi[i1],nu] + DC[Phibar[i1],nu] Phi[i1]) DC[FS[B,mu,rho],mu] FS[B,nu,rho]]
+OB2H2D29  := ExpandIndices[rB2H2D29 (Phibar[i1] DC[DC[Phi[i1],mu],mu] + DC[DC[Phibar[i1],mu],mu] Phi[i1]) FS[B,nu,rho] Dual[FS][B,nu,rho]]
+OB2H2D210 := ExpandIndices[rB2H2D210 I (Phibar[i1] DC[DC[Phi[i1],mu],mu] - DC[DC[Phibar[i1],mu],mu] Phi[i1]) FS[B,nu,rho] Dual[FS][B,nu,rho]]
+OB2H2D211 := ExpandIndices[rB2H2D211 (Phibar[i1] DC[Phi[i1],nu] + DC[Phibar[i1],nu] Phi[i1]) DC[FS[B,mu,rho],mu] Dual[FS][B,nu,rho]]
+OB2H2D212 := ExpandIndices[rB2H2D212 I (Phibar[i1] DC[Phi[i1],nu] - DC[Phibar[i1],nu] Phi[i1]) DC[FS[B,mu,rho],mu] Dual[FS][B,nu,rho]]
+OW2H2D27  := ExpandIndices[rW2H2D27 I Eps[j1,j2,j3] (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] - DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]) DC[FS[Wi,mu,rho,j2],mu] Dual[FS][Wi,nu,rho,j3]]
+OW2H2D28  := ExpandIndices[rW2H2D28 Eps[j1,j2,j3] Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] DC[DC[FS[Wi,mu,rho,j2],mu],nu] Dual[FS][Wi,nu,rho,j3]]
+OW2H2D29  := ExpandIndices[rW2H2D29 I (Phibar[i1] DC[Phi[i1],nu]-DC[Phibar[i1],nu] Phi[i1]) DC[FS[Wi,mu,rho,j1],mu] Dual[FS][Wi,nu,rho,j1]]
+OW2H2D210 := ExpandIndices[rW2H2D210 (DC[Phibar[i1],nu] Phi[i1]+Phibar[i1] DC[Phi[i1],nu]) DC[FS[Wi,mu,rho,j1],mu] Dual[FS][Wi,nu,rho,j1]]
+OW2H2D211 := ExpandIndices[rW2H2D211 (Phibar[i1] DC[Phi[i1],nu]+DC[Phibar[i1],nu] Phi[i1]) DC[FS[Wi,mu,rho,j1],mu] FS[Wi,nu,rho,j1]]
+OW2H2D212 := ExpandIndices[rW2H2D212 I (-DC[Phibar[i1],nu] Phi[i1]+Phibar[i1] DC[Phi[i1],nu]) DC[FS[Wi,mu,rho,j1],mu] FS[Wi,nu,rho,j1]]
+OW2H2D213 := ExpandIndices[rW2H2D213 Phibar[i1] Phi[i1] DC[FS[Wi,mu,rho,j1],mu] DC[FS[Wi,nu,rho,j1],nu]]
+OW2H2D214 := ExpandIndices[rW2H2D214 (DC[Phibar[i1],mu] Phi[i1]+Phibar[i1] DC[Phi[i1],mu])  FS[Wi,nu,rho,j1] DC[FS[Wi,nu,rho,j1],mu]]
+OW2H2D215 := ExpandIndices[rW2H2D215 I (DC[Phibar[i1],mu] Phi[i1] -Phibar[i1] DC[Phi[i1],mu]) FS[Wi,nu,rho,j1] DC[FS[Wi,nu,rho,j1],mu]]
+OW2H2D216 := ExpandIndices[rW2H2D216 (DC[Phibar[i1],mu] Phi[i1]+Phibar[i1] DC[Phi[i1],mu]) DC[FS[Wi,nu,rho,j1],mu] Dual[FS][Wi,nu,rho,j1]]
+OW2H2D217 := ExpandIndices[rW2H2D217 I (DC[Phibar[i1],mu] Phi[i1]-Phibar[i1] DC[Phi[i1],mu]) DC[FS[Wi,nu,rho,j1],mu] Dual[FS][Wi,nu,rho,j1]]
+OW2H2D218 := ExpandIndices[rW2H2D218 Eps[j1,j2,j3] (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu] + DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]) DC[FS[Wi,mu,rho,j2],mu] FS[Wi,nu,rho,j3]]
+OW2H2D219 := ExpandIndices[rW2H2D219 I Eps[j1,j2,j3] (-DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2] + Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) DC[FS[Wi,mu,rho,j2],mu] FS[Wi,nu,rho,j3]]
+OWBH2D27  := ExpandIndices[rWBH2D27 I (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]-DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2]) DC[FS[B,nu,rho],mu] FS[Wi,nu,rho,j1]]
+OWBH2D28  := ExpandIndices[rWBH2D28 (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]+DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]) DC[FS[B,mu,rho],mu] FS[Wi,nu,rho,j1]]
+OWBH2D29  := ExpandIndices[rWBH2D29 I (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]-DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]) DC[FS[B,mu,rho],mu] FS[Wi,nu,rho,j1]]
+OWBH2D210 := ExpandIndices[rWBH2D210 Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] DC[FS[B,mu,rho],mu] DC[FS[Wi,nu,rho,j1],nu]]
+OWBH2D211 := ExpandIndices[rWBH2D211 (DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]+Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) FS[B,mu,rho] DC[FS[Wi,nu,rho,j1],mu]]
+OWBH2D212 := ExpandIndices[rWBH2D212 I (DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]-Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) FS[B,mu,rho] DC[FS[Wi,nu,rho,j1],mu]]
+OWBH2D213 := ExpandIndices[rWBH2D213 Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] FS[B,mu,rho] DC[DC[FS[Wi,nu,rho,j1],mu],nu]]
+OWBH2D214 := ExpandIndices[rWBH2D214 I (DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]-Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) DC[FS[B,mu,rho],mu] Dual[FS][Wi,nu,rho,j1]]
+OWBH2D215 := ExpandIndices[rWBH2D215 I (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]-DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2]) DC[FS[B,nu,rho],mu] Dual[FS][Wi,nu,rho,j1]]
+OWBH2D216 := ExpandIndices[rWBH2D216 Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] DC[DC[FS[B,nu,rho],mu],mu] Dual[FS][Wi,nu,rho,j1]]
+OWBH2D217 := ExpandIndices[rWBH2D217 Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] DC[DC[FS[Wi,mu,nu,j1],mu],rho] Dual[FS][B,nu,rho]]
+OWBH2D218 := ExpandIndices[rWBH2D218 I (DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]-Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) Dual[FS][B,mu,rho] DC[FS[Wi,nu,rho,j1],mu]]
+OWBH2D219 := ExpandIndices[rWBH2D219 (DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] Phi[i2]+Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) Dual[FS][B,mu,rho] DC[FS[Wi,nu,rho,j1],mu]]
+
+(* X H^2 D^4 *)
+(***************************************************************************************************)
+(* Redundant *)
+OBH2D41   := ExpandIndices[rBH2D41 DC[FS[B,mu,nu],mu] (DC[Phibar[i1],nu] I DC[DC[Phi[i1],rho],rho] - I DC[DC[Phibar[i1],rho],rho] DC[Phi[i1],nu])]
+OBH2D42   := ExpandIndices[rBH2D42 DC[FS[B,mu,nu],mu] (DC[Phibar[i1],nu] DC[DC[Phi[i1],rho],rho] + DC[DC[Phibar[i1],rho],rho] DC[Phi[i1],nu])]
+OBH2D43   := ExpandIndices[rBH2D43 DC[FS[B,mu,nu],mu] (DC[DC[Phibar[i1],nu],rho] I DC[Phi[i1],rho] - I DC[Phibar[i1],rho] DC[DC[Phi[i1],nu],rho])]
+OWH2D41   := ExpandIndices[rWH2D41 DC[FS[Wi,mu,nu,j1],mu] (DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] I DC[DC[Phi[i2],rho],rho] - I DC[DC[Phibar[i2],rho],rho] 2 Ta[j1,i2,i1] DC[Phi[i1],nu])]
+OWH2D42   := ExpandIndices[rWH2D42 DC[FS[Wi,mu,nu,j1],mu] (DC[Phibar[i1],nu] 2 Ta[j1,i1,i2] DC[DC[Phi[i2],rho],rho] + DC[DC[Phibar[i2],rho],rho] 2 Ta[j1,i2,i1] DC[Phi[i1],nu])]
+OWH2D43   := ExpandIndices[rWH2D43 DC[FS[Wi,mu,nu,j1],mu] (DC[DC[Phibar[i1],nu],rho] 2 Ta[j1,i1,i2] I DC[Phi[i2],rho] - I DC[Phibar[i2],rho] 2 Ta[j1,i2,i1] DC[DC[Phi[i1],nu],rho])]
+
+(* X^3 H^2 *)
+(***************************************************************************************************)
+OG3H21    := ExpandIndices[aG3H21 f[c1,c2,c3] Phibar[i1] Phi[i1] FS[G,mu,nu,c1] FS[G,nu,rho,c2] FS[G,rho,mu,c3]]
+OG3H22    := ExpandIndices[aG3H22 f[c1,c2,c3] Phibar[i1] Phi[i1] FS[G,mu,nu,c1] FS[G,nu,rho,c2] Dual[FS][G,rho,mu,c3]]
+OW3H21    := ExpandIndices[aW3H21 Eps[j1,j2,j3] Phibar[i1] Phi[i1] FS[Wi,mu,nu,j1] FS[Wi,nu,rho,j2] FS[Wi,rho,mu,j3]]
+OW3H22    := ExpandIndices[aW3H22 Eps[j1,j2,j3] Phibar[i1] Phi[i1] FS[Wi,mu,nu,j1] FS[Wi,nu,rho,j2] Dual[FS][Wi,rho,mu,j3]]
+OW2BH21   := ExpandIndices[aW2BH21 Eps[j1,j2,j3] Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] FS[B,mu,nu] FS[Wi,nu,rho,j2] FS[Wi,rho,mu,j3]]
+OW2BH22   := ExpandIndices[aW2BH22 Eps[j1,j2,j3] Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2] (Dual[FS][B,mu,nu] FS[Wi,nu,rho,j2] FS[Wi,mu,rho,j3] + FS[B,mu,nu] FS[Wi,nu,rho,j2] Dual[FS][Wi,mu,rho,j3])]
+
+(* X^2 D^4 *)
+(***************************************************************************************************)
+(* Redundant *)
+OB2D4     := ExpandIndices[rB2D4 DC[DC[FS[B,mu,nu],mu],sigma] DC[DC[FS[B,rho,nu],rho],sigma]]
+OW2D4     := ExpandIndices[rW2D4 DC[DC[FS[Wi,mu,nu,j1],mu],sigma] DC[DC[FS[Wi,rho,nu,j1],rho],sigma]]
+OG2D4     := ExpandIndices[rG2D4 DC[DC[FS[G,mu,nu,c1],mu],sigma] DC[DC[FS[G,rho,nu,c1],rho],sigma]]
+
+(* X^3 D^2 *)
+(***************************************************************************************************)
+(* Redundant *)
+OW2BD21   := ExpandIndices[rW2BD21 FS[B,mu,nu] DC[FS[Wi,mu,nu,j1],rho] DC[FS[Wi,rho,sigma,j1],sigma]]
+OW2BD22   := ExpandIndices[rW2BD22 FS[B,mu,nu] DC[DC[FS[Wi,mu,rho,j1],sigma],sigma] FS[Wi,nu,rho,j1]]
+OW2BD23   := ExpandIndices[rW2BD23 Dual[FS][B,mu,nu] DC[FS[Wi,mu,nu,j1],rho] DC[FS[Wi,rho,sigma,j1],sigma]]
+OW2BD24   := ExpandIndices[rW2BD24 Dual[FS][B,mu,nu] DC[DC[FS[Wi,mu,rho,j1],sigma],sigma] FS[Wi,nu,rho,j1]]
+OG2BD21   := ExpandIndices[rG2BD21 FS[B,mu,nu] DC[FS[G,mu,nu,c1],rho] DC[FS[G,rho,sigma,c1],sigma]]
+OG2BD22   := ExpandIndices[rG2BD22 FS[B,mu,nu] DC[DC[FS[G,mu,rho,c1],sigma],sigma] FS[G,nu,rho,c1]]
+OG2BD23   := ExpandIndices[rG2BD23 Dual[FS][B,mu,nu] DC[FS[G,mu,nu,c1],rho] DC[FS[G,rho,sigma,c1],sigma]]
+OG2BD24   := ExpandIndices[rG2BD24 Dual[FS][B,mu,nu] DC[DC[FS[G,mu,rho,c1],sigma],sigma] FS[G,nu,rho,c1]]
+OW3D21    := ExpandIndices[rW3D21 Eps[j1,j2,j3] FS[Wi,mu,nu,j1] DC[FS[Wi,mu,nu,j2],rho] DC[FS[Wi,rho,sigma,j3],sigma]]
+OW3D22    := ExpandIndices[rW3D22 Eps[j1,j2,j3] FS[Wi,mu,nu,j1] DC[FS[Wi,rho,mu,j2],rho] DC[FS[Wi,sigma,nu,j3],sigma]]
+OW3D23    := ExpandIndices[rW3D23 Eps[j1,j2,j3] Dual[FS][Wi,mu,nu,j1] DC[FS[Wi,mu,nu,j2],rho] DC[FS[Wi,rho,sigma,j3],sigma]]
+OW3D24    := ExpandIndices[rW3D24 Eps[j1,j2,j3] Dual[FS][Wi,mu,nu,j1] DC[FS[Wi,rho,mu,j2],rho] DC[FS[Wi,sigma,nu,j3],sigma]]
+OG3D21    := ExpandIndices[rG3D21 f[c1,c2,c3] FS[G,mu,nu,c1] DC[FS[G,mu,nu,c2],rho] DC[FS[G,rho,sigma,c3],sigma]]
+OG3D22    := ExpandIndices[rG3D22 f[c1,c2,c3] FS[G,mu,nu,c1] DC[FS[G,rho,mu,c2],rho] DC[FS[G,sigma,nu,c3],sigma]]
+OG3D23    := ExpandIndices[rG3D23 f[c1,c2,c3] Dual[FS][G,mu,nu,c1] DC[FS[G,mu,nu,c2],rho] DC[FS[G,rho,sigma,c3],sigma]]
+OG3D24    := ExpandIndices[rG3D24 f[c1,c2,c3] Dual[FS][G,mu,nu,c1] DC[FS[G,rho,mu,c2],rho] DC[FS[G,sigma,nu,c3],sigma]]
+
+(* X^4 *)
+(***************************************************************************************************)
+OG41      := ExpandIndices[aG41 FS[G,mu,nu,c1] FS[G,mu,nu,c1] FS[G,rho,sigma,c2] FS[G,rho,sigma,c2]]
+OG42      := ExpandIndices[aG42 FS[G,mu,nu,c1] Dual[FS][G,mu,nu,c1] FS[G,rho,sigma,c2] Dual[FS][G,rho,sigma,c2]]
+OG43      := ExpandIndices[aG43 FS[G,mu,nu,c1] FS[G,mu,nu,c2] FS[G,rho,sigma,c1] FS[G,rho,sigma,c2]]
+OG44      := ExpandIndices[aG44 FS[G,mu,nu,c1] Dual[FS][G,mu,nu,c2] FS[G,rho,sigma,c1] Dual[FS][G,rho,sigma,c2]]
+OG45      := ExpandIndices[aG45 FS[G,mu,nu,c1] FS[G,mu,nu,c1] FS[G,rho,sigma,c2] Dual[FS][G,rho,sigma,c2]]
+OG46      := ExpandIndices[aG46 FS[G,mu,nu,c1] FS[G,mu,nu,c2] FS[G,rho,sigma,c1] Dual[FS][G,rho,sigma,c2]]
+OG47      := ExpandIndices[aG47 dSUN[c1,c2,c5] dSUN[c3,c4,c5] FS[G,mu,nu,c1] FS[G,mu,nu,c2] FS[G,rho,sigma,c3] FS[G,rho,sigma,c4]]
+OG48      := ExpandIndices[aG47 dSUN[c1,c2,c5] dSUN[c3,c4,c5] FS[G,mu,nu,c1] Dual[FS][G,mu,nu,c2] FS[G,rho,sigma,c3] Dual[FS][G,rho,sigma,c4]]
+OG49      := ExpandIndices[aG47 dSUN[c1,c2,c5] dSUN[c3,c4,c5] FS[G,mu,nu,c1] FS[G,mu,nu,c2] FS[G,rho,sigma,c3] Dual[FS][G,rho,sigma,c4]]
+OW41      := ExpandIndices[aW41 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1] FS[Wi,rho,sigma,j2] FS[Wi,rho,sigma,j2]]
+OW42      := ExpandIndices[aW42 FS[Wi,mu,nu,j1] Dual[FS][Wi,mu,nu,j1] FS[Wi,rho,sigma,j2] Dual[FS][Wi,rho,sigma,j2]]
+OW43      := ExpandIndices[aW43 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j2] FS[Wi,rho,sigma,j1] FS[Wi,rho,sigma,j2]]
+OW44      := ExpandIndices[aW44 FS[Wi,mu,nu,j1] Dual[FS][Wi,mu,nu,j2] FS[Wi,rho,sigma,j1] Dual[FS][Wi,rho,sigma,j2]]
+OW45      := ExpandIndices[aW45 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1] FS[Wi,rho,sigma,j2] Dual[FS][Wi,rho,sigma,j2]]
+OW46      := ExpandIndices[aW46 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j2] FS[Wi,rho,sigma,j1] Dual[FS][Wi,rho,sigma,j2]]
+OB41      := ExpandIndices[aB41 FS[B,mu,nu] FS[B,mu,nu] FS[B,rho,sigma] FS[B,rho,sigma]]
+OB42      := ExpandIndices[aB42 FS[B,mu,nu] Dual[FS][B,mu,nu] FS[B,rho,sigma] Dual[FS][B,rho,sigma]]
+OB43      := ExpandIndices[aB43 FS[B,mu,nu] FS[B,mu,nu] FS[B,rho,sigma] Dual[FS][B,rho,sigma]]
+OG3B1     := ExpandIndices[aG3B1 dSUN[c1,c2,c3] FS[B,mu,nu] FS[G,mu,nu,c1] FS[G,rho,sigma,c2] FS[G,rho,sigma,c3]]
+OG3B2     := ExpandIndices[aG3B2 dSUN[c1,c2,c3] FS[B,mu,nu] Dual[FS][G,mu,nu,c1] FS[G,rho,sigma,c2] Dual[FS][G,rho,sigma,c3]]
+OG3B3     := ExpandIndices[aG3B3 dSUN[c1,c2,c3] FS[B,mu,nu] Dual[FS][G,mu,nu,c1] FS[G,rho,sigma,c2] FS[G,rho,sigma,c3]]
+OG3B4     := ExpandIndices[aG3B1 dSUN[c1,c2,c3] FS[B,mu,nu] FS[G,mu,nu,c1] FS[G,rho,sigma,c2] Dual[FS][G,rho,sigma,c3]]
+OG2W21    := ExpandIndices[aG2W21 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1] FS[G,rho,sigma,c1] FS[G,rho,sigma,c1]]
+OG2W22    := ExpandIndices[aG2W22 FS[Wi,mu,nu,j1] Dual[FS][Wi,mu,nu,j1] FS[G,rho,sigma,c1] Dual[FS][G,rho,sigma,c1]]
+OG2W23    := ExpandIndices[aG2W23 FS[Wi,mu,nu,j1] FS[G,mu,nu,c1] FS[Wi,rho,sigma,c1] FS[G,rho,sigma,c1]]
+OG2W24    := ExpandIndices[aG2W24 FS[Wi,mu,nu,j1] Dual[FS][G,mu,nu,c1] FS[Wi,rho,sigma,j1] Dual[FS][G,rho,sigma,c1]]
+OG2W25    := ExpandIndices[aG2W25 FS[Wi,mu,nu,j1] Dual[FS][Wi,mu,nu,j1] FS[G,rho,sigma,c1] FS[G,rho,sigma,c1]]
+OG2W26    := ExpandIndices[aG2W26 FS[Wi,mu,nu,j1] FS[Wi,mu,nu] FS[G,rho,sigma,c1] Dual[FS][G,rho,sigma,c1]]
+OG2W27    := ExpandIndices[aG2W27 FS[Wi,mu,nu,j1] FS[G,mu,nu,c1] FS[Wi,rho,sigma] Dual[FS][G,rho,sigma,c1]]
+OG2B21    := ExpandIndices[aG2B21 FS[B,mu,nu] FS[B,mu,nu] FS[G,rho,sigma,c1] FS[G,rho,sigma,c1]]
+OG2B22    := ExpandIndices[aG2B22 FS[B,mu,nu] Dual[FS][B,mu,nu] FS[G,rho,sigma,c1] Dual[FS][G,rho,sigma,c1]]
+OG2B23    := ExpandIndices[aG2B23 FS[B,mu,nu] FS[G,mu,nu,c1] FS[B,rho,sigma] FS[G,rho,sigma,c1]]
+OG2B24    := ExpandIndices[aG2B24 FS[B,mu,nu] Dual[FS][G,mu,nu,c1] FS[B,rho,sigma] Dual[FS][G,rho,sigma,c1]]
+OG2B25    := ExpandIndices[aG2B25 FS[B,mu,nu] Dual[FS][B,mu,nu] FS[G,rho,sigma,c1] FS[G,rho,sigma,c1]]
+OG2B26    := ExpandIndices[aG2B26 FS[B,mu,nu] FS[B,mu,nu] FS[G,rho,sigma,c1] Dual[FS][G,rho,sigma,c1]]
+OG2B27    := ExpandIndices[aG2B27 FS[B,mu,nu] FS[G,mu,nu,c1] FS[B,rho,sigma] Dual[FS][G,rho,sigma,c1]]
+OW2B21    := ExpandIndices[aW2B21 FS[B,mu,nu] FS[B,mu,nu] FS[Wi,rho,sigma,j1] FS[Wi,rho,sigma,j1]]
+OW2B22    := ExpandIndices[aW2B22 FS[B,mu,nu] Dual[FS][B,mu,nu] FS[Wi,rho,sigma,j1] Dual[FS][Wi,rho,sigma,j1]]
+OW2B23    := ExpandIndices[aW2B23 FS[B,mu,nu] FS[Wi,mu,nu,j1] FS[B,rho,sigma] FS[Wi,rho,sigma,j1]]
+OW2B24    := ExpandIndices[aW2B24 FS[B,mu,nu] Dual[FS][Wi,mu,nu,j1] FS[B,rho,sigma] Dual[FS][Wi,rho,sigma,j1]]
+OW2B25    := ExpandIndices[aW2B25 FS[B,mu,nu] FS[B,mu,nu] FS[Wi,rho,sigma,j1] FS[Wi,rho,sigma,j1]]
+OW2B26    := ExpandIndices[aW2B26 FS[B,mu,nu] FS[B,mu,nu] FS[Wi,rho,sigma,j1] Dual[FS][Wi,rho,sigma,j1]]
+OW2B27    := ExpandIndices[aW2B27 FS[B,mu,nu] FS[Wi,mu,nu,j1] FS[B,rho,sigma] Dual[FS][Wi,rho,sigma,j1]]
+
+(* Psi^2 H^5 *)
+(***************************************************************************************************)
+OleH5     := ExpandIndices[aleH5[f1,f2] Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] LLbar[sp1,i3,f1] ER[sp1,f2] Phi[i3]]
+OquH5     := ExpandIndices[aquH5[f1,f2] Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] QLbar[sp1,i3,c1,f1] UR[sp1,c1,f2] Eps[i3,i4] Phibar[i4]]
+OqdH5     := ExpandIndices[aqdH5[f1,f2] Phibar[i1] Phi[i1] Phibar[i2] Phi[i2] QLbar[sp1,i3,c1,f1] DR[sp1,c1,f2] Phi[i3]]
+
+(* Psi^2 X H^3 *)
+(***************************************************************************************************)
+OleWH31   := ExpandIndices[aleWH31[f1,f2] LLbar[sp1,i1,f1].sigma[mu,nu,sp1,sp2].ER[sp2,f2] 2 Ta[j1,i1,i2] Phi[i2] Phibar[i3] Phi[i3] FS[Wi,mu,nu,j1]]
+OleWH32   := ExpandIndices[aleWH32[f1,f2] LLbar[sp1,i1,f1].sigma[mu,nu,sp1,sp2].ER[sp2,f2] Phi[i1] Phibar[i2] 2 Ta[j1,i2,i3] Phi[i3] FS[Wi,mu,nu,j1]]
+OleBH3    := ExpandIndices[aleBH3[f1,f2]  LLbar[sp1,i1,f1].sigma[mu,nu,sp1,sp2].ER[sp2,f2] Phi[i1] Phibar[i2] Phi[i2] FS[B,mu,nu]]
+OquGH3    := ExpandIndices[aquGH3[f1,f2]  QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] T[cc,c1,c2] UR[sp2,c2,f2] Eps[i1,i2] Phibar[i2] Phibar[i3] Phi[i3] FS[G,mu,nu,cc]]
+OquWH31   := ExpandIndices[aquWH31[f1,f2] QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] UR[sp2,c1,f2] 2 Ta[j1,i1,i2] Eps[i2,i3] Phibar[i3] Phibar[i4] Phi[i4] FS[Wi,mu,nu,j1]]
+OquWH32   := ExpandIndices[aquWH32[f1,f2] QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] UR[sp2,c1,f2] Eps[i1,i2] Phibar[i2] Phibar[i3] 2 Ta[j1,i3,i4] Phi[i4] FS[Wi,mu,nu,j1]]
+OquBH3    := ExpandIndices[aquBH3[f1,f2]  QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] UR[sp2,c1,f2] Eps[i1,i2] Phibar[i2] Phibar[i3] Phi[i3] FS[B,mu,nu]]
+OqdGH3    := ExpandIndices[aqdGH3[f1,f2]  QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] T[cc,c1,c2] DR[sp2,c2,f2] Phi[i1] Phibar[i3] Phi[i3] FS[G,mu,nu,cc]]
+OqdWH31   := ExpandIndices[aqdWH31[f1,f2] QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] DR[sp2,c1,f2] 2 Ta[j1,i1,i2] Phi[i2] Phibar[i4] Phi[i4] FS[Wi,mu,nu,j1]]
+OqdWH32   := ExpandIndices[aqdWH32[f1,f2] QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] DR[sp2,c1,f2] Phi[i1] Phibar[i3] 2 Ta[j1,i3,i4] Phi[i4] FS[Wi,mu,nu,j1]]
+OqdBH3    := ExpandIndices[aqdBH3[f1,f2]  QLbar[sp1,i1,c1,f1] sigma[mu,nu,sp1,sp2] DR[sp2,c1,f2] Phi[i1] Phibar[i3] Phi[i3] FS[B,mu,nu]]
+
+(* Psi^2 H^3 D^2 *)
+(***************************************************************************************************)
+OleH3D21  := ExpandIndices[aleH3D21[f1,f2] (DC[Phibar[i1],mu] DC[Phi[i1],mu]) (LLbar[sp1,i2,f1] ER[sp1,f2] Phi[i2])]
+OleH3D22  := ExpandIndices[aleH3D22[f1,f2] (DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]) (LLbar[sp1,i3,f1] ER[sp1,f2] 2 Ta[j1,i3,i4] Phi[i4])]
+OleH3D23  := ExpandIndices[aleH3D23[f1,f2] (DC[Phibar[i1],mu] DC[Phi[i1],nu]) (LLbar[sp1,i2,f1] sigma[mu,nu,sp1,sp2] ER[sp2,f2] Phi[i2])]
+OleH3D24  := ExpandIndices[aleH3D24[f1,f2] (DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) (LLbar[sp1,i3,f1] sigma[mu,nu,sp1,sp2] ER[sp2,f2] 2 Ta[j1,i3,i4] Phi[i4])]
+OleH3D25  := ExpandIndices[aleH3D25[f1,f2] (Phibar[i1] DC[Phi[i1],mu]) (LLbar[sp1,i2,f1] ER[sp1,f2] DC[Phi[i2],mu])]
+OleH3D26  := ExpandIndices[aleH3D26[f1,f2] (Phibar[i1] DC[Phi[i1],mu]) (LLbar[sp1,i2,f1] sigma[mu,nu,sp1,sp2] ER[sp2,f2] DC[Phi[i2],nu])]
+OquH3D21  := ExpandIndices[aquH3D21[f1,f2] (DC[Phibar[i1],mu] DC[Phi[i1],mu]) (QLbar[sp1,i2,c1,f1] UR[sp1,c1,f2]  Phibar[i3]  Eps[i2,i3])]
+OquH3D22  := ExpandIndices[aquH3D22[f1,f2] (DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]) (QLbar[sp1,i3,c1,f1] UR[sp1,c1,f2] 2 Ta[j1,i3,i4] Phibar[i5] Eps[i4,i5])]
+OquH3D23  := ExpandIndices[aquH3D23[f1,f2] (DC[Phibar[i1],mu] DC[Phi[i1],nu]) (QLbar[sp1,i2,c1,f1] sigma[mu,nu,sp1,sp2] UR[sp2,c1,f2] Phibar[i3] Eps[i2,i3])]
+OquH3D24  := ExpandIndices[aquH3D24[f1,f2] (DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) (QLbar[sp1,i3,c1,f1] sigma[mu,nu,sp1,sp2] UR[sp2,c1,f2] 2 Ta[j1,i3,i4] Phibar[i5] Eps[i5,i4])]
+OquH3D25  := ExpandIndices[aquH3D25[f1,f2] (DC[Phibar[i1],mu] Phi[i1]) (QLbar[sp1,i2,c1,f1] UR[sp1,c1,f2] DC[Phibar[i3],mu] Eps[i2,i3])]
+OquH3D26  := ExpandIndices[aquH3D26[f1,f2] (DC[Phibar[i1],mu] Phi[i1]) (QLbar[sp1,i2,c1,f1] sigma[mu,nu,sp1,sp2] UR[sp2,c1,f2] DC[Phibar[i3],nu] Eps[i3,i2])]
+OqdH3D21  := ExpandIndices[aqdH3D21[f1,f2] (DC[Phibar[i1],mu] DC[Phi[i1],mu]) (QLbar[sp1,i2,c1,f1] DR[sp1,c1,f2] Phi[i2])]
+OqdH3D22  := ExpandIndices[aqdH3D22[f1,f2] (DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]) (QLbar[sp1,i3,c1,f1] DR[sp1,c1,f2] 2 Ta[j1,i3,i4] Phi[i4])]
+OqdH3D23  := ExpandIndices[aqdH3D23[f1,f2] (DC[Phibar[i1],mu] DC[Phi[i1],nu]) (QLbar[sp1,i2,c1,f1] sigma[mu,nu,sp1,sp2] DR[sp2,c1,f2] Phi[i2])]
+OqdH3D24  := ExpandIndices[aqdH3D24[f1,f2] (DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] DC[Phi[i2],nu]) (QLbar[sp1,i3,c1,f1] sigma[mu,nu,sp1,sp2] DR[sp2,c1,f2] 2 Ta[j1,i3,i4] Phi[i4])]
+OqdH3D25  := ExpandIndices[aqdH3D25[f1,f2] (Phibar[i1] DC[Phi[i1],mu]) (QLbar[sp1,i2,c1,f1] DR[sp1,c1,f2] DC[Phi[i2],mu])]
+OqdH3D26  := ExpandIndices[aqdH3D26[f1,f2] (Phibar[i1] DC[Phi[i1],mu]) (QLbar[sp1,i2,c1,f1] sigma[mu,nu,sp1,sp2] DR[sp2,c1,f2] DC[Phi[i2],nu])]
+
+(* Psi^2 H^2 D^3 *)
+(***************************************************************************************************)
+Ol2H2D31  := ExpandIndices[al2H2D31[f1,f2] I LLbar[sp1,i1,f1] Ga[mu,sp1,sp2] DC[LL[sp2,i1,f2],nu] (DC[DC[Phibar[i2],nu],mu]+DC[DC[Phibar[i2],mu],nu]) Phi[i2]]
+Ol2H2D32  := ExpandIndices[al2H2D32[f1,f2] I LLbar[sp1,i1,f1] Ga[mu,sp1,sp2] DC[LL[sp2,i1,f2],nu] Phibar[i2] (DC[DC[Phi[i2],nu],mu]+DC[DC[Phi[i2],mu],nu])]
+Ol2H2D33  := ExpandIndices[al2H2D33[f1,f2] I LLbar[sp1,i1,f1] Ga[mu,sp1,sp2] 2 Ta[j1,i1,i2] DC[LL[sp2,i2,f2],nu] (DC[DC[Phibar[i3],nu],mu]+DC[DC[Phibar[i3],mu],nu]) 2 Ta[j1,i3,i4] Phi[i4]]
+Ol2H2D34  := ExpandIndices[al2H2D34[f1,f2] I LLbar[sp1,i1,f1] Ga[mu,sp1,sp2] 2 Ta[j1,i1,i2] DC[LL[sp2,i2,f2],nu] Phibar[i3] 2 Ta[j1,i3,i4] (DC[DC[Phi[i4],nu],mu]+DC[DC[Phi[i4],mu],nu])]
+Oe2H2D31  := ExpandIndices[ae2H2D31[f1,f2] I ERbar[sp1,f1] Ga[mu,sp1,sp2] DC[ER[sp2,f2],nu] (DC[DC[Phibar[i2],nu],mu]+DC[DC[Phibar[i2],mu],nu]) Phi[i2]]
+Oe2H2D32  := ExpandIndices[ae2H2D32[f1,f2] I ERbar[sp1,f1] Ga[mu,sp1,sp2] DC[ER[sp2,f2],nu] Phibar[i2] (DC[DC[Phi[i2],nu],mu]+DC[DC[Phi[i2],mu],nu])]
+Oq2H2D31  := ExpandIndices[aq2H2D31[f1,f2] I QLbar[sp1,i1,c1,f1] Ga[mu,sp1,sp2] DC[QL[sp2,i1,c1,f2],nu] (DC[DC[Phibar[i2],nu],mu]+DC[DC[Phibar[i2],mu],nu]) Phi[i2]]
+Oq2H2D32  := ExpandIndices[aq2H2D32[f1,f2] I QLbar[sp1,i1,c1,f1] Ga[mu,sp1,sp2] DC[QL[sp2,i1,c1,f2],nu] Phibar[i2] (DC[DC[Phi[i2],nu],mu]+DC[DC[Phi[i2],mu],nu])]
+Oq2H2D33  := ExpandIndices[aq2H2D33[f1,f2] I QLbar[sp1,i1,c1,f1] Ga[mu,sp1,sp2] 2 Ta[j1,i1,i2] DC[QL[sp2,i2,c1,f2],nu] (DC[DC[Phibar[i3],nu],mu]+DC[DC[Phibar[i3],mu],nu]) 2 Ta[j1,i3,i4] Phi[i4]]
+Oq2H2D34  := ExpandIndices[aq2H2D34[f1,f2] I QLbar[sp1,i1,c1,f1] Ga[mu,sp1,sp2] 2 Ta[j1,i1,i2] DC[QL[sp2,i2,c1,f2],nu] Phibar[i3] 2 Ta[j1,i3,i4] (DC[DC[Phi[i4],nu],mu]+DC[DC[Phi[i4],mu],nu])]
+Ou2H2D31  := ExpandIndices[au2H2D31[f1,f2] I URbar[sp1,c1,f1] Ga[mu,sp1,sp2] DC[UR[sp2,c1,f2],nu] (DC[DC[Phibar[i2],nu],mu]+DC[DC[Phibar[i2],mu],nu]) Phi[i2]]
+Ou2H2D32  := ExpandIndices[au2H2D32[f1,f2] I URbar[sp1,c1,f1] Ga[mu,sp1,sp2] DC[UR[sp2,c1,f2],nu] Phibar[i2] (DC[DC[Phi[i2],nu],mu]+DC[DC[Phi[i2],mu],nu])]
+Od2H2D31  := ExpandIndices[ad2H2D31[f1,f2] I DRbar[sp1,c1,f1] Ga[mu,sp1,sp2] DC[DR[sp2,c1,f2],nu] (DC[DC[Phibar[i2],nu],mu]+DC[DC[Phibar[i2],mu],nu]) Phi[i2]]
+Od2H2D32  := ExpandIndices[ad2H2D32[f1,f2] I DRbar[sp1,c1,f1] Ga[mu,sp1,sp2] DC[DR[sp2,c1,f2],nu] Phibar[i2] (DC[DC[Phi[i2],nu],mu]+DC[DC[Phi[i2],mu],nu])]
+OudH2D3   := ExpandIndices[audH2D3[f1,f2] I URbar[sp1,c1,f1] Ga[mu,sp1,sp2] DC[DR[sp2,c1,f2],nu] Eps[i1,i2] Phi[i1] (DC[DC[Phi[i2],nu],mu]+DC[DC[Phi[i2],mu],nu])]
+
+(* Psi^2 H^4 D *)
+(***************************************************************************************************)
+Ol2H4D1   := ExpandIndices[al2H4D1[f1,f2] I LLbar[sp1,i1,f1].Ga[mu,sp1,sp2].LL[sp2,i1,f2] (Phibar[i2] DC[Phi[i2],mu]-DC[Phibar[i2],mu] Phi[i2]) Phibar[i3] Phi[i3]]
+Ol2H4D2   := ExpandIndices[al2H4D2[f1,f2] I LLbar[sp1,i1,f1].Ga[mu,sp1,sp2].LL[sp2,i2,f2] 2 Ta[j1,i1,i2] ( (Phibar[i3] 2 Ta[j1,i3,i4] DC[Phi[i4],mu]-DC[Phibar[i3],mu] 2 Ta[j1,i3,i4] Phi[i4]) Phibar[i5] Phi[i5] + (Phibar[i3] DC[Phi[i3],mu]-DC[Phibar[i3],mu] Phi[i3]) Phibar[i4] 2 Ta[j1,i4,i5] Phi[i5])]
+Ol2H4D3   := Sum[ExpandIndices[al2H4D3[f1,f2] I Eps[j1,j2,j3] LLbar[sp1,i1,f1].Ga[mu,sp1,sp2].LL[sp2,i2,f2] 2 Ta[j1,i1,i2] (Phibar[i3] 2 Ta[j2,i3,i4] DC[Phi[i4],mu]-DC[Phibar[i3],mu] 2 Ta[j2,i3,i4] Phi[i4]) (Phibar[i5] 2 Ta[j3,i5,i6] Phi[i6])], {j1,1,3},{j2,1,3},{j3,1,3}]
+Ol2H4D4   := Sum[ExpandIndices[al2H4D4[f1,f2] Eps[j1,j2,j3] LLbar[sp1,i1,f1].Ga[mu,sp1,sp2].LL[sp2,i2,f2] 2 Ta[j1,i1,i2] (Phibar[i3] 2 Ta[j2,i3,i4] Phi[i4]) DC[(Phibar[i5] 2 Ta[j3,i5,i6] Phi[i6]),mu]],{j1,1,3},{j2,1,3},{j3,1,3}]
+Oe2H4D    := ExpandIndices[ae2H4D[f1,f2] I ERbar[sp1,f1].Ga[mu,sp1,sp2].ER[sp2,f2] (Phibar[i2] DC[Phi[i2],mu]-DC[Phibar[i2],mu] Phi[i2]) Phibar[i3] Phi[i3]]
+Oq2H4D1   := ExpandIndices[aq2H4D1[f1,f2] I QLbar[sp1,i1,c1,f1].Ga[mu,sp1,sp2].QL[sp2,i1,c1,f2] (Phibar[i2] DC[Phi[i2],mu]-DC[Phibar[i2],mu] Phi[i2]) Phibar[i3] Phi[i3]]
+Oq2H4D2   := ExpandIndices[aq2H4D2[f1,f2] I QLbar[sp1,i1,c1,f1].Ga[mu,sp1,sp2].QL[sp2,i2,c1,f2] 2 Ta[j1,i1,i2] ( (Phibar[i3] 2 Ta[j1,i3,i4] DC[Phi[i4],mu]-DC[Phibar[i3],mu] 2 Ta[j1,i3,i4] Phi[i4]) Phibar[i5] Phi[i5] + (Phibar[i3] DC[Phi[i3],mu]-DC[Phibar[i3],mu] Phi[i3]) Phibar[i4] 2 Ta[j1,i4,i5] Phi[i5])]
+Oq2H4D3   := Sum[ExpandIndices[aq2H4D3[f1,f2] I Eps[j1,j2,j3] QLbar[sp1,i1,c1,f1].Ga[mu,sp1,sp2].QL[sp2,i2,c1,f2] 2 Ta[j1,i1,i2] (Phibar[i3] 2 Ta[j2,i3,i4] DC[Phi[i4],mu]-DC[Phibar[i3],mu] 2 Ta[j2,i3,i4] Phi[i4]) (Phibar[i5] 2 Ta[j3,i5,i6] Phi[i6])], {j1,1,3},{j2,1,3},{j3,1,3}]
+Oq2H4D4   := Sum[ExpandIndices[aq2H4D4[f1,f2] Eps[j1,j2,j3] QLbar[sp1,i1,c1,f1].Ga[mu,sp1,sp2].QL[sp2,i2,c1,f2] 2 Ta[j1,i1,i2] (Phibar[i3] 2 Ta[j2,i3,i4] Phi[i4]) DC[(Phibar[i5] 2 Ta[j3,i5,i6] Phi[i6]),mu]],{j1,1,3},{j2,1,3},{j3,1,3}]
+Ou2H4D    := ExpandIndices[au2H4D[f1,f2] I URbar[sp1,c1,f1].Ga[mu,sp1,sp2].UR[sp2,c1,f2] (Phibar[i2] DC[Phi[i2],mu]-DC[Phibar[i2],mu] Phi[i2]) Phibar[i3] Phi[i3]]
+Od2H4D    := ExpandIndices[ad2H4D[f1,f2] I DRbar[sp1,c1,f1].Ga[mu,sp1,sp2].DR[sp2,c1,f2] (Phibar[i2] DC[Phi[i2],mu]-DC[Phibar[i2],mu] Phi[i2]) Phibar[i3] Phi[i3]]
+OudH4D    := ExpandIndices[audH4D[f1,f2] I URbar[sp1,c1,f1].Ga[mu,sp1,sp2].DR[sp2,c1,f2] Eps[i1,i2] (Phi[i1] DC[Phi[i2],mu]-DC[Phi[i1],mu] Phi[i2]) Phibar[i3] Phi[i3]]
+
+
+(* Psi^2 X H^2 D *) (* INCOMPLETE *)
+(***************************************************************************************************)
+Oe2WH2D1  := ExpandIndices[ae2WH2D1[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] DC[Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2],mu] FS[Wi,mu,nu,j1]]
+Oe2WH2D2  := ExpandIndices[ae2WH2D2[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] DC[Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2],mu] Dual[FS][Wi,mu,nu,j1]]
+Oe2WH2D3  := ExpandIndices[ae2WH2D3[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] I (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]-DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2]) FS[Wi,mu,nu,j1]]
+Oe2WH2D4  := ExpandIndices[ae2WH2D4[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] I (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]-DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2]) Dual[FS][Wi,mu,nu,j1]]
+Oe2BH2D1  := ExpandIndices[ae2BH2D1[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] DC[Phibar[i1] Phi[i1],mu] FS[B,mu,nu]]
+Oe2BH2D2  := ExpandIndices[ae2BH2D2[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] DC[Phibar[i1] Phi[i1],mu] Dual[FS][B,mu,nu]]
+Oe2BH2D3  := ExpandIndices[ae2BH2D3[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] I (Phibar[i1] DC[Phi[i1],mu]-DC[Phibar[i1],mu] Phi[i1]) FS[B,mu,nu]]
+Oe2BH2D4  := ExpandIndices[ae2BH2D4[f1,f2] ERbar[sp1,f1].Ga[nu,sp1,sp2].ER[sp2,f2] I (Phibar[i1] DC[Phi[i1],mu]-DC[Phibar[i1],mu] Phi[i1]) Dual[FS][B,mu,nu]]
+
+Ou2GH2D1  := ExpandIndices[au2GH2D1[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c2,f2] T[c3,c1,c2] DC[Phibar[i1] Phi[i1],mu] FS[G,mu,nu,c3]]
+Ou2GH2D2  := ExpandIndices[au2GH2D2[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c2,f2] T[c3,c1,c2] DC[Phibar[i1] Phi[i1],mu] Dual[FS][G,mu,nu,c3]]
+Ou2GH2D3  := ExpandIndices[au2GH2D3[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c2,f2] T[c3,c1,c2] I (Phibar[i1] DC[Phi[i1],mu]-DC[Phibar[i1],mu] Phi[i1]) FS[G,mu,nu,c3]]
+Ou2GH2D4  := ExpandIndices[au2GH2D4[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c2,f2] T[c3,c1,c2] I (Phibar[i1] DC[Phi[i1],mu]-DC[Phibar[i1],mu] Phi[i1]) Dual[FS][G,mu,nu,c3]]
+
+Ou2WH2D1  := ExpandIndices[au2WH2D1[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) DC[(Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2]),mu] FS[Wi,mu,nu,j1]]
+Ou2WH2D2  := ExpandIndices[au2WH2D2[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) DC[(Phibar[i1] 2 Ta[j1,i1,i2] Phi[i2]),mu] Dual[FS][Wi,mu,nu,j1]]
+Ou2WH2D3  := ExpandIndices[au2WH2D3[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) I (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]-DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2]) FS[Wi,mu,nu,j1]]
+Ou2WH2D4  := ExpandIndices[au2WH2D4[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) I (Phibar[i1] 2 Ta[j1,i1,i2] DC[Phi[i2],mu]-DC[Phibar[i1],mu] 2 Ta[j1,i1,i2] Phi[i2]) Dual[FS][Wi,mu,nu,j1]]
+Ou2BH2D1  := ExpandIndices[au2BH2D1[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) DC[(Phibar[i1] Phi[i1]),mu] FS[B,mu,nu]]
+Ou2BH2D2  := ExpandIndices[au2BH2D2[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) DC[(Phibar[i1] Phi[i1]),mu] Dual[FS][B,mu,nu]]
+Ou2BH2D3  := ExpandIndices[au2BH2D3[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) I (Phibar[i1] DC[Phi[i1],mu]-DC[Phibar[i1],mu] Phi[i1]) FS[B,mu,nu]]
+Ou2BH2D4  := ExpandIndices[au2BH2D4[f1,f2] (URbar[sp1,c1,f1].Ga[nu,sp1,sp2].UR[sp2,c1,f2]) I (Phibar[i1] DC[Phi[i1],mu]-DC[Phibar[i1],mu] Phi[i1]) Dual[FS][B,mu,nu]]
+
+OudGH2D1  := ExpandIndices[audGH2D1[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].DR[sp2,c2,f2] T[c3,c1,c2] (Phi[i1] Eps[i1,i2] DC[Phi[i2],mu]) FS[G,c3,mu,nu]]
+OudGH2D2  := ExpandIndices[audGH2D2[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].DR[sp2,c2,f2] T[c3,c1,c2] (Phi[i1] Eps[i1,i2] DC[Phi[i2],mu]) Dual[FS][G,c3,mu,nu]]
+OudWH2D1  := ExpandIndices[audWH2D1[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].DR[sp2,c1,f2] (Phi[i1] Eps[i1,i2] 2 Ta[j1,i2,i3] DC[Phi[i3],mu]) FS[Wi,mu,nu,j1]]
+OudWH2D2  := ExpandIndices[audWH2D2[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].DR[sp2,c1,f2] (Phi[i1] Eps[i1,i2] 2 Ta[j1,i2,i3] DC[Phi[i3],mu]) Dual[FS][Wi,mu,nu,j1]]
+OudBH2D1  := ExpandIndices[audBH2D1[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].DR[sp2,c1,f2] (Phi[i1] Eps[i1,i2] DC[Phi[i2],mu]) FS[B,mu,nu]]
+OudBH2D2  := ExpandIndices[audBH2D2[f1,f2] URbar[sp1,c1,f1].Ga[nu,sp1,sp2].DR[sp2,c1,f2] (Phi[i1] Eps[i1,i2] DC[Phi[i2],mu]) Dual[FS][B,mu,nu]]
+
+Ol2WH2D1  := ExpandIndices[al2WH2D1[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) DC[Phibar[i2] 2 Ta[j1,i2,i3]*Phi[i3],mu] FS[Wi,mu,nu,j1]]
+Ol2WH2D2  := ExpandIndices[al2WH2D2[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) DC[Phibar[i2] 2 Ta[j1,i2,i3]*Phi[i3],mu] Dual[FS][Wi,mu,nu,j1]]
+Ol2WH2D3  := ExpandIndices[al2WH2D3[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) I (Phibar[i2] 2 Ta[j1,i2,i3]*DC[Phi[i3],mu]-DC[Phibar[i2],mu] 2 Ta[j1,i2,i3]*Phi[i3]) FS[Wi,mu,nu,j1]]
+Ol2WH2D4  := ExpandIndices[al2WH2D4[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) I (Phibar[i2] 2 Ta[j1,i2,i3]*DC[Phi[i3],mu]-DC[Phibar[i2],mu] 2 Ta[j1,i2,i3]*Phi[i3]) Dual[FS][Wi,mu,nu,j1]]
+Ol2WH2D5  := ExpandIndices[al2WH2D5[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) DC[Phibar[i3]*Phi[i3],mu] FS[Wi,mu,nu,j1]]
+Ol2WH2D6  := ExpandIndices[al2WH2D6[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) DC[Phibar[i3]*Phi[i3],mu] Dual[FS][Wi,mu,nu,j1]]
+Ol2WH2D7  := ExpandIndices[al2WH2D7[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) I (Phibar[i3]*DC[Phi[i3],mu]-DC[Phibar[i3],mu]*Phi[i3]) FS[Wi,mu,nu,j1]]
+Ol2WH2D8  := ExpandIndices[al2WH2D8[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) I (Phibar[i3]*DC[Phi[i3],mu]-DC[Phibar[i3],mu]*Phi[i3]) Dual[FS][Wi,mu,nu,j1]]
+Ol2WH2D9  := ExpandIndices[al2WH2D9[f1,f2] Eps[j1,j2,j3]*(LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2])*DC[(Phibar[i3] 2 Ta[j2,i3,i4]*Phi[i4]),mu] FS[Wi,mu,nu,j3]]
+Ol2WH2D10 := ExpandIndices[al2WH2D10[f1,f2] Eps[j1,j2,j3]*(LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2])*DC[(Phibar[i3] 2 Ta[j2,i3,i4]*Phi[i4]),mu] Dual[FS][Wi,mu,nu,j3]]
+Ol2WH2D11 := ExpandIndices[al2WH2D11[f1,f2] Eps[j1,j2,j3]*(LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2])*I(Phibar[i3] 2 Ta[j2,i3,i4]*DC[Phi[i4],mu]-DC[Phibar[i3],mu]*2 Ta[j2,i3,i4]*Phi[i4]) FS[Wi,mu,nu,j3]]
+Ol2WH2D12 := ExpandIndices[al2WH2D12[f1,f2] Eps[j1,j2,j3]*(LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2])*I(Phibar[i3] 2 Ta[j2,i3,i4]*DC[Phi[i4],mu]-DC[Phibar[i3],mu]*2 Ta[j2,i3,i4]*Phi[i4]) Dual[FS][Wi,mu,nu,j3]]
+Ol2BH2D1  := ExpandIndices[al2BH2D1[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) DC[(Phibar[i3] 2 Ta[j1,i3,i4]*Phi[i4]),mu] FS[B,mu,nu]]
+Ol2BH2D2  := ExpandIndices[al2BH2D2[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) DC[(Phibar[i3] 2 Ta[j1,i3,i4]*Phi[i4]),mu] Dual[FS][B,mu,nu]]
+Ol2BH2D3  := ExpandIndices[al2BH2D3[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) I (Phibar[i3] 2 Ta[j1,i3,i4]*DC[Phi[i4],mu]-DC[Phibar[i3],mu]*2 Ta[j1,i3,i4]*Phi[i4]) FS[B,mu,nu]]
+Ol2BH2D4  := ExpandIndices[al2BH2D4[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] 2 Ta[j1,i1,i2] LL[sp2,i2,f2]) I (Phibar[i3] 2 Ta[j1,i3,i4]*DC[Phi[i4],mu]-DC[Phibar[i3],mu]*2 Ta[j1,i3,i4]*Phi[i4]) Dual[FS][B,mu,nu]]
+Ol2BH2D5  := ExpandIndices[al2BH2D5[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) DC[(Phibar[i2]*Phi[i2]),mu] FS[B,mu,nu]]
+Ol2BH2D6  := ExpandIndices[al2BH2D6[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) DC[(Phibar[i2]*Phi[i2]),mu] Dual[FS][B,mu,nu]]
+Ol2BH2D7  := ExpandIndices[al2BH2D7[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) I (Phibar[i2]*DC[Phi[i2],mu]-DC[Phibar[i2],mu]*Phi[i2]) FS[B,mu,nu]]
+Ol2BH2D8  := ExpandIndices[al2BH2D8[f1,f2] (LLbar[sp1,i1,f1] Ga[nu,sp1,sp2] LL[sp2,i1,f2]) I (Phibar[i2]*DC[Phi[i2],mu]-DC[Phibar[i2],mu]*Phi[i2]) Dual[FS][B,mu,nu]]
+
+
+(* Psi^2 X^2 D *) (* INCOMPLETE AND SO FAR WITH NO FLAVOUR *)
+(***************************************************************************************************)
+Oe2B2D1   := ExpandIndices[ae2B2D1 I (ERbar[sp1,f1] Ga[mu,sp1,sp2] DC[ER[sp2,f1],nu]-DC[ERbar[sp1,f1],nu] Ga[mu,sp1,sp2] ER[sp2,f1]) FS[B,mu,rho] FS[B,nu,rho]]
+(* Redundant *)
+Oe2B2D2   := ExpandIndices[re2B2D2 I (ERbar[sp1,f1] Ga[mu,sp1,sp2] DC[ER[sp2,f1],mu]-DC[ERbar[sp1,f1],mu] Ga[mu,sp1,sp2] ER[sp2,f1]) FS[B,nu,rho] FS[B,nu,rho]]
+Oe2B2D5   := ExpandIndices[re2B2D5 (ERbar[sp1,f1] Ga[mu,sp1,sp2] DC[ER[sp2,f1],nu]+DC[ERbar[sp1,f1],nu] Ga[mu,sp1,sp2] ER[sp2,f1]) FS[B,mu,rho] FS[B,nu,rho]]
+Oe2B2D6   := ExpandIndices[re2B2D6 (ERbar[sp1,f1] Ga[mu,sp1,sp2] DC[ER[sp2,f1],mu]+DC[ERbar[sp1,f1],mu] Ga[mu,sp1,sp2] ER[sp2,f1]) FS[B,nu,rho] FS[B,nu,rho]]
+
+(* Psi^2 B D^3 *)
+(* Redundant *)
+Oe2BD31   := ExpandIndices[re2BD31 FS[B,mu,nu] ERbar[sp1,f1] Ga[nu,sp1,sp2] DC[DC[DC[ER[sp2,f1],rho],rho],mu]]
+Oe2BD33   := ExpandIndices[re2BD33 DC[DC[DC[FS[B,mu,nu],mu],rho],rho] ERbar[sp1,f1] Ga[nu,sp1,sp2] ER[sp2,f1]]
+Oe2BD34   := ExpandIndices[re2BD34 FS[B,mu,nu] DC[ERbar[sp1,f1],mu] Ga[rho,sp1,sp2] DC[DC[ER[sp2,f1],rho],nu]]
+Oe2BD35   := ExpandIndices[re2BD35 FS[B,mu,nu] DC[ERbar[sp1,f1],mu] Ga[nu,sp1,sp2]  DC[DC[ER[sp2,f1],rho],rho]]
+Oe2BD36   := ExpandIndices[re2BD36 I FS[B,mu,nu] ERbar[sp1,f1] Ga[nu,sp1,sp2] DC[DC[DC[ER[sp2,f1],rho],rho],mu]]
+Oe2BD38   := ExpandIndices[re2BD38 I FS[B,mu,nu] DC[ERbar[sp1,f1],mu] Ga[rho,sp1,sp2] DC[DC[ER[sp2,f1],rho],nu]]
+Oe2BD39   := ExpandIndices[re2BD39 I FS[B,mu,nu] DC[ERbar[sp1,f1],mu] Ga[nu,sp1,sp2]  DC[DC[ER[sp2,f1],rho],rho]]
+Oe2BD310  := ExpandIndices[re2BD310 I Eps[mu,nu,rho,sigma] FS[B,lambda,mu] DC[ERbar[sp1,f1],nu] Ga[sigma,sp1,sp2] DC[DC[ER[sp2,f1],rho],lambda]]

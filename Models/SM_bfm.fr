@@ -1,0 +1,795 @@
+M$ModelName = "model-loop";
+
+FeynmanGauge = True;
+
+M$GaugeGroups = {
+  U1Y  == { 
+    Abelian          -> True,  
+(*    CouplingConstant -> g1, *)
+    CouplingConstant  -> 0,
+    GaugeBoson       -> B, 
+    Charge           -> Y
+  },
+
+  SU2L == {
+    Abelian           -> False,
+    CouplingConstant  -> g2,
+    (*CouplingConstant  -> 0,*)
+    GaugeBoson        -> Wi,
+    StructureConstant -> Eps,
+    Representations   -> {Ta, SU2D},
+    Definitions       -> {Ta[a_,b_,c_] -> PauliSigma[a,b,c]/2, FSU2L[i_,j_,k_] :> I Eps[i,j,k]}
+  },
+
+    SU3C == {
+    Abelian           -> False,
+(*  CouplingConstant  -> gs, *)
+    CouplingConstant  -> 0,
+    GaugeBoson        -> G,
+    StructureConstant -> f,
+    Representations   -> {T,Colour},
+    SymmetricTensor   -> dSUN
+    }
+};
+
+IndexRange[Index[SU2D]] = Unfold[Range[2]];
+IndexRange[Index[SU2W]] = Unfold[Range[3]];
+IndexRange[Index[Gluon]] = NoUnfold[Range[8]];
+IndexRange[Index[Colour]] = NoUnfold[Range[3]];
+IndexRange[Index[Generation]] = NoUnfold[Range[3]];
+
+IndexStyle[SU2W,j];
+IndexStyle[SU2D,i];
+IndexStyle[Gluon,c];
+IndexStyle[Colour,c];
+IndexStyle[Generation,f];
+
+M$ClassesDescription = {
+
+  V[1] == { 
+    ClassName     -> B, 
+    SelfConjugate -> True,
+    Mass          -> 0,
+    Width         -> 0
+  },
+
+  V[2] == {
+    ClassName      -> W,
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> 1},
+    Mass           -> 0,
+    Width          -> 0
+  },
+
+  V[3] == {
+    ClassName     -> W3,
+    SelfConjugate -> True,
+    Mass          -> 0,
+    Width         -> 0
+  },
+
+  V[4] == {
+    ClassName      -> Wi,
+    Unphysical     -> True,
+    SelfConjugate  -> True,
+    Indices        -> {Index[SU2W]},
+    FlavorIndex    -> SU2W,
+    Definitions    -> {Wi[mu_,1] -> (Wbar[mu]+W[mu])/Sqrt[2], Wi[mu_,2] -> (Wbar[mu]-W[mu])/(I*Sqrt[2]), Wi[mu_,3] -> W3[mu]}
+  },
+
+  V[5] == {
+    ClassName     -> G,
+    SelfConjugate -> True,
+    Indices       -> {Index[Gluon]},
+    Mass          -> 0,
+    Width         -> 0
+  },
+
+  V[6] == {
+    ClassName     -> Bquan, 
+    SelfConjugate -> True,
+    Mass          -> 0,
+    Width         -> 0
+  },
+
+  V[7] == {
+    ClassName      -> Wquan,
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> 1},
+    Mass           -> 0,
+    Width          -> 0
+  },
+
+  V[8] == {
+    ClassName     -> W3quan,
+    SelfConjugate -> True,
+    Mass          -> 0,
+    Width         -> 0
+  },
+
+  V[9] == {
+    ClassName      -> Wiquan,
+    Unphysical     -> True,
+    SelfConjugate  -> True,
+    Indices        -> {Index[SU2W]},
+    FlavorIndex    -> SU2W,
+    Definitions    -> {Wiquan[mu_,1] -> (Wquanbar[mu]+Wquan[mu])/Sqrt[2], Wiquan[mu_,2] -> (Wquanbar[mu]-Wquan[mu])/(I*Sqrt[2]), Wiquan[mu_,3] -> W3quan[mu]}
+  },
+
+    V[10] == {
+    ClassName     -> Gquan,
+    SelfConjugate -> True,
+    Indices       -> {Index[Gluon]},
+    Mass          -> 0,
+    Width         -> 0
+    },
+
+  U[1] == {
+    ClassName       -> ghB,
+    SelfConjugate   -> False,
+    Ghost           -> B,
+    QuantumNumbers  -> {GhostNumber -> 1},
+    Mass            -> 0,
+    Width           -> 0
+  },
+
+  U[2] == {
+    ClassName       -> ghWp,
+    SelfConjugate   -> False,
+    Ghost           -> W,
+    QuantumNumbers  -> {GhostNumber -> 1, Q -> 1},
+    Mass            -> 0,
+    Width           -> 0
+  },
+
+  U[3] == {
+    ClassName      -> ghWm,
+    SelfConjugate  -> False,
+    Ghost          -> Wbar,
+    QuantumNumbers -> {GhostNumber -> 1, Q -> -1},
+    Mass           -> 0,
+    Width          -> 0
+  },
+
+  U[4] == {
+    ClassName      -> ghW3,
+    SelfConjugate  -> False,
+    Ghost          -> W3,
+    QuantumNumbers -> {GhostNumber -> 1},
+    Mass           -> 0,
+    Width          -> 0
+  },
+
+  U[5] == {
+    ClassName      -> ghWi,
+    Unphysical     -> True,
+    SelfConjugate  -> False,
+    Indices        -> {Index[SU2W]},
+    Ghost          -> Wi,
+    QuantumNumbers -> {GhostNumber -> 1},
+    FlavorIndex    -> SU2W,
+    Definitions    -> {ghWi[1] -> (ghWp+ghWm)/Sqrt[2], ghWi[2] -> (ghWm-ghWp)/(I*Sqrt[2]), ghWi[3] -> ghW3}
+  },
+
+    U[6] == {
+    ClassName      -> ghG,
+    SelfConjugate  -> False,
+    Indices        -> {Index[Gluon]},
+    Ghost          -> G,
+    QuantumNumbers -> {GhostNumber -> 1},
+    Mass           -> 0,
+    Width           -> 0
+    },
+
+  F[1] == { 
+    ClassName      -> vL,
+    Indices        -> {Index[Generation]},
+    SelfConjugate  -> False,
+    Mass           -> 0
+  },
+
+  F[2] == { 
+    ClassName      -> eL, 
+    Indices        -> {Index[Generation]},
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> -1},
+    Mass           -> 0
+  },
+
+  F[3] == { 
+    ClassName      -> eR,
+    Indices        -> {Index[Generation]},
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> -1},
+    Mass           -> 0
+  },
+
+  F[5] == {
+    ClassName      -> LL,
+    Unphysical     -> True,
+    Indices        -> {Index[SU2D],Index[Generation]},
+    FlavorIndex    -> SU2D,
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Y -> -1/2},
+    Definitions    -> {LL[sp1_,1,ff_] :> Module[{sp2}, ProjM[sp1,sp2] vL[sp2,ff]], LL[sp1_,2,ff_] :> Module[{sp2}, ProjM[sp1,sp2] eL[sp2,ff]]}
+  },
+
+  F[6] == {
+    ClassName      -> ER,
+    Unphysical     -> True,
+    Indices        -> {Index[Generation]},
+    SelfConjugate  -> False,
+    Mass           -> 0,
+    QuantumNumbers -> {Y -> -1},
+    Definitions    -> {ER[sp_,ff_] :> right[eR[sp,ff]]}
+  },
+
+  F[8] == {
+   ClassName      -> uL,
+   Indices        -> {Index[Colour],Index[Generation]},
+   QuantumNumbers -> {Q -> 2/3},
+   SelfConjugate  -> False,
+   Mass           -> 0
+  },
+
+  F[9] == {
+    ClassName      -> dL,
+    Indices        -> {Index[Colour],Index[Generation]},
+    QuantumNumbers -> {Q -> -1/3},
+    SelfConjugate  -> False,
+    Mass           -> 0
+  },
+
+  F[10] == {
+    ClassName      -> uR,
+    Indices        -> {Index[Colour],Index[Generation]},
+    QuantumNumbers -> {Q -> 2/3},
+    SelfConjugate  -> False,
+    Mass           -> 0
+  },
+
+  F[11] == {
+    ClassName      -> dR,
+    Indices        -> {Index[Colour],Index[Generation]},
+    QuantumNumbers -> {Q -> -1/3},
+    SelfConjugate  -> False,
+    Mass           -> 0
+  },
+
+  F[12] == {
+    ClassName      -> QL,
+    Unphysical     -> True,
+    Indices        -> {Index[SU2D], Index[Colour],Index[Generation]},
+    FlavorIndex    -> SU2D,
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Y -> 1/6},
+    Definitions    -> {QL[sp1_,1,cc_,ff_] :> Module[{sp2}, ProjM[sp1,sp2] uL[sp2,cc,ff]], QL[sp1_,2,cc_,ff_] :> Module[{sp2}, ProjM[sp1,sp2] dL[sp2,cc,ff]]}
+  },
+
+  F[13] == {
+    ClassName      -> UR,
+    Unphysical     -> True,
+    Indices        -> {Index[Colour],Index[Generation]},
+    SelfConjugate  -> False,
+    Mass           -> 0,
+    QuantumNumbers -> {Y -> 2/3},
+    Definitions    -> {UR[sp_,cc_,ff_] :> right[uR[sp,cc,ff]]}
+  },
+
+    F[14] == {
+    ClassName      -> DR,
+    Unphysical     -> True,
+    Indices        -> {Index[Colour],Index[Generation]},
+    SelfConjugate  -> False,
+    Mass           -> 0,
+    QuantumNumbers -> {Y -> -1/3},
+    Definitions    -> {DR[sp_,cc_,ff_] :> right[dR[sp,cc,ff]]}
+    },
+
+  S[1] == { 
+    ClassName      -> H0, 
+    SelfConjugate  -> False,
+    Mass           -> 0
+  },
+
+  S[2] == { 
+    ClassName      -> Hp, 
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> 1},
+    Mass           -> 0
+  },
+
+  S[3] == { 
+    ClassName      -> Phi,
+    Unphysical     -> True,
+    Indices        -> {Index[SU2D]},
+    FlavorIndex    -> SU2D,
+    SelfConjugate  -> False,
+    Mass           -> 0,
+    QuantumNumbers -> {Y -> 1/2},
+    Definitions    -> {Phi[1] -> Hp, Phi[2] -> H0}
+  }
+
+};
+
+M$Parameters = {
+
+  cexp == { 
+    ParameterType    -> Internal,
+    InteractionOrder -> {NP, 1}  
+  },
+
+  mH == { 
+    ParameterType    -> Internal
+  },
+
+  g1 == { 
+    ParameterType    -> Internal
+  },
+
+  g2 == { 
+    ParameterType    -> Internal
+  },
+
+  \[Lambda] == { 
+    ParameterType    -> Internal
+  },
+
+  gs == {
+    ParameterType    -> Internal
+  },
+
+  YU == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  YD == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  YE == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  aHWtB == {
+    ParameterType    -> Internal
+  },
+
+  aHWB == {
+    ParameterType    -> Internal
+  },
+
+  aHW == {
+    ParameterType    -> Internal
+  },
+
+  aHWt == {
+    ParameterType    -> Internal
+  },
+
+  aHB == {
+    ParameterType    -> Internal
+  },
+
+  aHBt == {
+    ParameterType    -> Internal
+  },
+
+  aHG == {
+    ParameterType    -> Internal
+  },
+
+  aHGt == {
+    ParameterType    -> Internal
+  },
+	
+  aHD == {
+    ParameterType    -> Internal
+  },
+
+  aHDD == {
+    ParameterType    -> Internal
+  },
+
+  aH == {
+    ParameterType    -> Internal
+  },
+
+  a3W == {
+    ParameterType    -> Internal
+  },
+
+  a3Wt == {
+    ParameterType    -> Internal
+  },
+
+  a3G == {
+    ParameterType    -> Internal
+  },
+
+  a3Gt == {
+    ParameterType    -> Internal
+  },
+
+  aeH == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  auH == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  adH == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  aHe == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aHl3 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aHl1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aHud == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  aHd == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aHu == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aHq3 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aHq1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aeB == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  aeW == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  auB == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  auW == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  adB == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  adW == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  adG == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  auG == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  },
+
+  r2W == {
+    ParameterType    -> Internal
+  },
+
+  r2B == {
+    ParameterType    -> Internal
+  },
+
+  rWDH == {
+    ParameterType    -> Internal
+  },
+
+  rBDH == {
+    ParameterType    -> Internal
+  },
+
+  rDH == {
+    ParameterType    -> Internal
+  },
+
+  rHDp == {
+    ParameterType    -> Internal
+  },
+
+  rHDpp == {
+    ParameterType    -> Internal
+  },
+
+  rWl == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rWlp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rWtlp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rBl == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rBlp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rBtlp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rHl1p == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rHl1pp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rHl3p == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rHl3pp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rlD == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rGqp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rGtqp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rBqp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  rBtqp == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]},
+    Hermitian        -> True
+  },
+
+  aqq1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aqq3 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  auu == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  add == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aud1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aud8 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aqu1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aqu8 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aqd1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aqd8 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aquqd1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aquqd8 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aall == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aee == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  ale == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  alq1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  alq3 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aeu == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aed == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aqe == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  alu == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  ald == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aledq == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  alequ1 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  alequ3 == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation],Index[Generation],Index[Generation]}
+  },
+
+  aLH == {
+    ParameterType    -> Internal,
+    Indices          -> {Index[Generation],Index[Generation]}
+  }
+
+};
+
+
+(* Lagrangian *)
+
+gotoBFM = {Wi[a__]->Wi[a]+Wiquan[a],B[a__]->B[a]+Bquan[a],G[a__]->G[a]+Gquan[a]};
+
+Lfermion := ExpandIndices[I LLbar[sp1,i1,f1].Ga[mu,sp1,sp2].DC[LL[sp2,i1,f1], mu] + I ERbar[sp1,f1].Ga[mu,sp1,sp2].DC[ER[sp2,f1],mu] + I QLbar[sp1,i1,c1,f1].Ga[mu,sp1,sp2].DC[QL[sp2,i1,c1,f1], mu] + I DRbar[sp1,c1,f1].Ga[mu,sp1,sp2].DC[DR[sp2,c1,f1], mu] + I URbar[sp1,c1,f1].Ga[mu,sp1,sp2].DC[UR[sp2,c1,f1], mu]/.gotoBFM]
+
+LHiggs := ExpandIndices[DC[Phibar[i1],mu] DC[Phi[i1],mu] - \[Lambda] Phibar[i1] Phi[i1] Phibar[i2] Phi[i2]/.gotoBFM]
+
+LYukawa := ExpandIndices[- YU[f1,f2] QLbar[sp1,i1,c1,f1].UR[sp1,c1,f2] Eps[i1,i2] Phibar[i2] - YD[f1,f2] QLbar[sp1,i1,c1,f1].DR[sp1,c1,f2] Phi[i1] - YE[f1,f2] LLbar[sp1,i1,f1].ER[sp1,f2] Phi[i1] /.gotoBFM]
+
+(*Lgauge := ExpandIndices[-1/4 FS[B,mu,nu] FS[B,mu,nu] - 1/4 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1] - 1/4 FS[G,mu,nu,c1] FS[G,mu,nu,c1]/.gotoBFM]*)
+Lgauge := ExpandIndices[ - 1/4 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1] /.gotoBFM]
+
+(*Lghost := ExpandIndices[-ghBbar.DC[DC[ghB,mu]/.gotoBFM,mu] - ghWibar[j1].DC[DC[ghWi[j1],mu]/.gotoBFM,mu] - ghGbar[c1].DC[DC[ghG[c1],mu]/.gotoBFM,mu]]*)
+Lghost := ExpandIndices[- ghWibar[j1].DC[DC[ghWi[j1],mu]/.gotoBFM,mu]]
+
+(*Lfixing := ExpandIndices[-1/2 DC[Wiquan[mu,j1],mu] DC[Wiquan[nu,j1],nu] -1/2 DC[Bquan[mu],mu] DC[Bquan[nu],nu] -1/2 DC[Gquan[mu,c1], mu] DC[Gquan[nu,c1],nu]]*)
+Lfixing := ExpandIndices[-1/2 DC[Wiquan[mu,j1],mu] DC[Wiquan[nu,j1],nu]]
+
+
+sigma[mu_,nu_,sp1_,sp2_] := I/2 (Ga[mu,sp1,sp3].Ga[nu,sp3,sp2] - Ga[nu,sp1,sp3].Ga[mu,sp3,sp2])
+
+
+LSM := Lfermion + LHiggs + (LYukawa + HC[LYukawa]) + Lgauge + Lghost + Lfixing
+
+(*LSM := 0*)

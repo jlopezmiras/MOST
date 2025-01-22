@@ -1,0 +1,177 @@
+M$ModelName = "model";
+
+FeynmanGauge = True;
+
+M$GaugeGroups = {
+  U1Y  == { 
+    Abelian          -> True,  
+    CouplingConstant -> g1, 
+    (*CouplingConstant -> 0,*)
+    GaugeBoson       -> B, 
+    Charge           -> Y
+  },
+
+  SU2L == {
+    Abelian           -> False,
+    CouplingConstant  -> g2,
+    (*CouplingConstant  -> 0,*)
+    GaugeBoson        -> Wi,
+    StructureConstant -> Eps,
+    Representations   -> {Ta, SU2D},
+    Definitions       -> {Ta[a_,b_,c_] -> PauliSigma[a,b,c]/2, FSU2L[i_,j_,k_] :> I Eps[i,j,k]}
+  }
+};
+
+IndexRange[Index[SU2D]] = Unfold[Range[2]];
+IndexRange[Index[SU2W]] = Unfold[Range[3]];
+
+IndexStyle[SU2W,j];
+IndexStyle[SU2D,i];
+
+M$ClassesDescription = {
+
+  V[1] == { 
+    ClassName     -> B, 
+    SelfConjugate -> True,
+    Mass          -> mB,
+    Width         -> 0,
+    FullName      -> "light"
+  },
+
+  V[2] == {
+    ClassName      -> W,
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> 1},
+    Mass           -> 0,
+    Width          -> 0,
+    FullName       -> "light"
+  },
+
+  V[3] == {
+    ClassName     -> W3,
+    SelfConjugate -> True,
+    Mass          -> 0,
+    Width         -> 0,
+    FullName      -> "light"
+  },
+
+  V[4] == {
+    ClassName      -> Wi,
+    Unphysical     -> True,
+    SelfConjugate  -> True,
+    Indices        -> {Index[SU2W]},
+    FlavorIndex    -> SU2W,
+    Definitions    -> {Wi[mu_,1] -> (Wbar[mu]+W[mu])/Sqrt[2], Wi[mu_,2] -> (Wbar[mu]-W[mu])/(I*Sqrt[2]), Wi[mu_,3] -> W3[mu]}
+  },
+
+  F[1] == { 
+    ClassName      -> vL,
+    SelfConjugate  -> False,
+    Mass           -> 0
+  },
+
+  F[2] == { 
+    ClassName      -> eL, 
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> -1},
+    Mass           -> 0
+  },
+
+  F[3] == { 
+    ClassName      -> eR,
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> -1},
+    Mass           -> 0
+  },
+
+  F[5] == {
+    ClassName      -> LL,
+    Unphysical     -> True,
+    Indices        -> {Index[SU2D]},
+    FlavorIndex    -> SU2D,
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Y -> -1/2},
+    Definitions    -> {LL[sp1_,1] :> Module[{sp2}, ProjM[sp1,sp2] vL[sp2]], LL[sp1_,2] :> Module[{sp2}, ProjM[sp1,sp2] eL[sp2]]}
+  },
+
+  F[6] == {
+    ClassName      -> ER,
+    Unphysical     -> True,
+    SelfConjugate  -> False,
+    Mass           -> 0,
+    QuantumNumbers -> {Y -> -1},
+    Definitions    -> {ER[sp_] :> right[eR[sp]]}
+  },
+
+  S[1] == { 
+    ClassName      -> H0, 
+    SelfConjugate  -> False,
+    Mass           -> mH
+  },
+
+  S[2] == { 
+    ClassName      -> Hp, 
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> 1},
+    Mass           -> mH
+  },
+
+  S[3] == { 
+    ClassName      -> Phi,
+    Unphysical     -> True,
+    Indices        -> {Index[SU2D]},
+    FlavorIndex    -> SU2D,
+    SelfConjugate  -> False,
+    Mass           -> mH,
+    QuantumNumbers -> {Y -> 1/2},
+    Definitions    -> {Phi[1] -> Hp, Phi[2] -> H0}
+  }
+
+};
+
+M$Parameters = {
+
+  cexp == { 
+    ParameterType    -> Internal,
+    InteractionOrder -> {NP, 1}  
+  },
+
+  mH == { 
+    ParameterType    -> Internal
+  },
+
+  g1 == { 
+    ParameterType    -> Internal
+  },
+
+  g2 == { 
+    ParameterType    -> Internal
+  },
+
+  lmbd == { 
+    ParameterType    -> Internal
+  },
+
+  YE == {
+    ParameterType    -> Internal,
+    ComplexParameter -> True
+  }
+
+};
+
+
+(* Lagrangian *)
+
+Lfermion := ExpandIndices[I LLbar[sp1,i1].Ga[mu,sp1,sp2].DC[LL[sp2,i1], mu] + I ERbar[sp1].Ga[mu,sp1,sp2].DC[ER[sp2],mu]]
+
+LHiggs := ExpandIndices[DC[Phibar[i1],mu] DC[Phi[i1],mu] - mH^2 Phibar[i1] Phi[i1] - lmbd Phibar[i1] Phi[i1] Phibar[i2] Phi[i2]]
+
+LYukawa := ExpandIndices[-YE LLbar[sp1,i1].ER[sp1] Phi[i1]]
+
+Lgauge := ExpandIndices[-1/4 FS[B,mu,nu] FS[B,mu,nu] - 1/4 FS[Wi,mu,nu,j1] FS[Wi,mu,nu,j1] ]
+
+sigma[mu_,nu_,sp1_,sp2_] := I/2 (Ga[mu,sp1,sp3].Ga[nu,sp3,sp2] - Ga[nu,sp1,sp3].Ga[mu,sp3,sp2])
+
+
+LSM := LHiggs + Lgauge + LYukawa + HC[LYukawa] + Lfermion
+
