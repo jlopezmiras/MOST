@@ -34,6 +34,9 @@ SeparateKinStructs
 PropagatorAttributes::usage = "PropagatorAttributes[field,EFTOrder,model]"
 AllPropagatorAttributes
 
+FindCrossings
+UnDoCrossings
+
 EFTSeries
 EFTSeriesRational
 PerturbativeExpand
@@ -292,9 +295,8 @@ AmplitudeComputation[process_,EFTOrder_,model_,OptionsPattern[]]:=Module[{fields
 	posInsertedTopos=Flatten@Map[Position[List@@unCrossedTopos,#]&,insertedTopos];
 	
 	amp = (FCFAConvert[CreateFeynAmp[Head[diags]@#],IncomingMomenta->momentaList,List->True] &/@(List@@diags))/.RenameCoeff[model];
-	(*JAVI Echo["Amplitude computed"];*)
-	amp = Contract[amp(*,EpsContract->True,EpsExpand->False,Expanding->False,ExpandScalarProduct->False,Factoring->False,
-									FCE->False,FCI->False,FCVerbose->False,MomentumCombine->False*)];
+	
+	amp = Contract[amp,ExpandScalarProduct->False];
 	amp = ExplicitEFTOrder@amp /. FeynAmpDenominator[PD[P_,m_]] :> DenProp[Pair[P,P],m^2];
 	
 	amp = Sum[inv\[CapitalLambda]^k Coefficient[#,inv\[CapitalLambda],k],{k,0,EFTOrder-4}]&/@ amp;
@@ -382,7 +384,7 @@ Bare2PhysMass[field_,EFTOrder_,model_] := Bare2PhysMass[field,EFTOrder,model] = 
 ]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Crossing - related functions*)
 
 
