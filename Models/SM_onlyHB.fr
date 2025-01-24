@@ -1,0 +1,98 @@
+M$ModelName = "model";
+
+FeynmanGauge = True;
+
+M$GaugeGroups = {
+  U1Y  == { 
+    Abelian          -> True,  
+    CouplingConstant -> g1, 
+    (*CouplingConstant -> 0,*)
+    GaugeBoson       -> B, 
+    Charge           -> Y
+  }
+};
+
+IndexRange[Index[SU2D]] = Unfold[Range[2]];
+IndexRange[Index[SU2W]] = Unfold[Range[3]];
+
+IndexStyle[SU2W,j];
+IndexStyle[SU2D,i];
+
+M$ClassesDescription = {
+
+  V[1] == { 
+    ClassName     -> B, 
+    SelfConjugate -> True,
+    Mass[Internal]  -> mB,
+    Mass[External]  -> 0,
+    Width         -> 0,
+    FullName      -> "light"
+  },
+  
+  S[1] == { 
+    ClassName      -> H0, 
+    SelfConjugate  -> False,
+    Mass           -> mH
+  },
+
+  S[2] == { 
+    ClassName      -> Hp, 
+    SelfConjugate  -> False,
+    QuantumNumbers -> {Q -> 1},
+    Mass           -> mH
+  },
+
+  S[3] == { 
+    ClassName      -> Phi,
+    Unphysical     -> True,
+    Indices        -> {Index[SU2D]},
+    FlavorIndex    -> SU2D,
+    SelfConjugate  -> False,
+    Mass           -> mH,
+    QuantumNumbers -> {Y -> 1/2},
+    Definitions    -> {Phi[1] -> Hp, Phi[2] -> H0}
+  }
+
+};
+
+M$Parameters = {
+
+  cexp == { 
+    ParameterType    -> Internal,
+    InteractionOrder -> {NP, 1}  
+  },
+
+  mH == { 
+    ParameterType    -> Internal
+  },
+
+  g1 == { 
+    ParameterType    -> Internal
+  },
+
+  g2 == { 
+    ParameterType    -> Internal
+  },
+
+  lmbd == { 
+    ParameterType    -> Internal
+  },
+
+  YE == {
+    ParameterType    -> Internal,
+    ComplexParameter -> True
+  }
+
+};
+
+
+(* Lagrangian *)
+
+LHiggs := ExpandIndices[DC[Phibar[i1],mu] DC[Phi[i1],mu] - mH^2 Phibar[i1] Phi[i1] - lmbd Phibar[i1] Phi[i1] Phibar[i2] Phi[i2]]
+
+Lgauge := ExpandIndices[-1/4 FS[B,mu,nu] FS[B,mu,nu]]
+
+sigma[mu_,nu_,sp1_,sp2_] := I/2 (Ga[mu,sp1,sp3].Ga[nu,sp3,sp2] - Ga[nu,sp1,sp3].Ga[mu,sp3,sp2])
+
+
+LSM := LHiggs + Lgauge
