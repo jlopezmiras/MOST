@@ -37,10 +37,17 @@ AllPropagatorAttributes
 FindCrossings
 UnDoCrossings
 
+FindIsomorphisms
+PermuteAmplitudes
+RecoverFullAmplitude
+
+
+
 EFTSeries
 EFTSeriesRational
 PerturbativeExpand
 SolvePerturbative
+SolvePerturbative2
 ExplicitEFTOrder
 
 mphys2
@@ -159,8 +166,22 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 	(*Get processes excluding particles of ExcludeParticles*)
 	processes = Select[ProcessList[modelphys], FreeQ[#,Alternatives@@OptionValue[ExcludeParticles]] &];
 	
+	processes = With[{feynmanrules=Association@@(FeynArts`M$CouplingMatrices/.{Equal->Rule})},
+					DeleteDuplicatesBy[processes,feynmanrules@*C@@#&]];
+	
 	(*Get processes and order them with respect to number of particles and a greater number of identical particles*)
-	processes = SortBy[DeleteCases[processes,{_,_}], {Length,Last/@Tally[#]&}];
+	processes = SortBy[processes,
+					{
+						Length,
+						With[{feynmanrules=Association@@(FeynArts`M$CouplingMatrices/.{Equal->Rule})},
+						-(HeavisideTheta[Length@DeleteDuplicatesBy[DeleteCases[Flatten@feynmanrules[C@@#],0],#/First@DeleteCases[Flatten@{CoefficientList[#,Variables[#]]},0]&]
+								-Length@DeleteDuplicates@Variables[feynmanrules[C@@#]]]/.HeavisideTheta[0]->1)] &,
+						With[{feynmanrules=Association@@(FeynArts`M$CouplingMatrices/.{Equal->Rule})},
+						Length@DeleteDuplicatesBy[DeleteCases[Flatten@feynmanrules[C@@#],0],#/First@DeleteCases[Flatten@{CoefficientList[#,Variables[#]]},0]&]]&,
+						(*Count[#,F[_]]&,
+						Count[#,V[_]]&,*)
+						Last/@Tally
+					}];
 	(*processes = DeleteCases[ProcessList[modelphys],{_,_}];*)
 	(*Sort each process so that we have first fermions, then vectors and finally scalars*)
 	processesSorted = SortBy[#,Position[{F,V,S},Head[-#/.{-f_:>f}]]&]&/@ processes;
@@ -178,7 +199,13 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 		Continue[];
 		,
 		Echo[processesSorted[[k]],"Computing process: "];
-		Echo[CoeffInteraction[processes[[k]]],"Appearing couplings: "];
+		Print[Style["Appearing couplings: ",RGBColor[0.94,0.5,0.04],"Text"], 
+				Style["{", RGBColor[0.06,0.06,0.06]], 
+				##,
+				Style["}", RGBColor[0.06,0.06,0.06]]]
+			&@@ Riffle[
+					(Style[#,"StandardForm",If[!MemberQ[Keys[reduction]/.Coeff[c_,__]:>c,#],RGBColor[0.25,0.42,0.94], RGBColor[0.06,0.06,0.06]]]&/@CoeffInteraction[processes[[k]]]),
+					Style[", ","Text", RGBColor[0.06,0.06,0.06]]];
 	];
 	
 	matchEqs={};
@@ -187,7 +214,7 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 								"Amplitude Full"];
 	{ampPhys, crossingsPhys} = EchoTiming[AmplitudeComputation[processesSorted[[k]],EFTOrder,modelphys,SeparateCrossings->True,ExcludeParticles->OptionValue[ExcludeParticles]],
 								"Amplitude Phys"];
-		
+(*
 	(*Change bare masses by physical ones*)
 		ampFull = ampFull/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]}],
 							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelfull]};
@@ -196,9 +223,19 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 		
 		ampPhys = ExplicitEFTOrder @ PerturbativeExpand[ampPhys,EFTOrder,modelphys];
 	(*EFT Series*)
-		ampFull = EchoTiming[ EFTSeries[ExplicitEFTOrder[ampFull],EFTOrder],"EFTSeries in ampFull"];
-		ampPhys = EchoTiming[(EFTSeries[ampPhys,EFTOrder]) //.reduction ,"EFTSeries in ampPhys and replace previous results"];
-		
+		ampFull = EchoTiming[ EFTSeriesRational[ExplicitEFTOrder[ampFull],EFTOrder],"EFTSeries in ampFull"];
+		ampPhys = EchoTiming[(EFTSeriesRational[ampPhys,EFTOrder]) //.reduction ,"EFTSeries in ampPhys and replace previous results"];
+*)
+
+		ampFull = EchoTiming[(Total@MapThread[EFTSeries[#2/.ExplicitEFTOrder@Bare2PhysMass[processes[[k]],EFTOrder-#1,modelfull], EFTOrder-#1, ExplicitEFTOrder->False]&,
+						Through[{Flatten@*Keys,Values}[#]]]&/@#)&/@ CoefficientRules[ampFull,inv\[CapitalLambda]] ,"EFTSeries in ampFull"];
+						
+		ampPhys = ampPhys/.Flatten@{#[[1]]^n_:>EFTSeries[#[[2]]^n,EFTOrder]&/@Flatten[{Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]}],
+							Bare2PhysMass[DeleteDuplicates@processes[[k]],EFTOrder,modelphys]};
+		ampPhys = ExplicitEFTOrder @ PerturbativeExpand[ampPhys,EFTOrder,modelphys];
+		ampPhys = EchoTiming[(EFTSeriesRational[ampPhys,EFTOrder]) //.reduction ,"EFTSeries in ampPhys and replace previous results"];
+						
+			
 	(*Computation of rational kinematics*)
 		(*Symbolic physical masses to be replaced with already computed mphys2 at the end*)
 		(*If any of mphys2 is 0, we take advantage of this and put MPhysSymbol to 0 at this stage.
@@ -210,19 +247,26 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 		nEqs = Max[Values[CountsBy[varsPhys,#[[2]]&]]]; (*Max number of coefficients with same EFTOrder*)
 		
 		(*First, flue back the full amplitude with all crossings*)
-		ampFull = Quiet@Simplify[Plus@@UnDoCrossings[MomentumExpand@ampFull, crossingsFull], TimeConstraint->{0.01,1}];
-		ampPhys = Quiet@Simplify[Plus@@UnDoCrossings[MomentumExpand@ampPhys, crossingsPhys], TimeConstraint->{0.01,1}];
+		ampFull = Quiet@Simplify[Plus@@RecoverFullAmplitude[MomentumExpand@ampFull, crossingsFull], TimeConstraint->{0.01,1}];
+		ampPhys = Quiet@Simplify[Plus@@RecoverFullAmplitude[MomentumExpand@ampPhys, crossingsPhys], TimeConstraint->{0.01,1}];
 		
 		Do[
 			ampsNumeric = EchoTiming[SustMomentaOptimized[{ampFull,ampPhys},##,masseslist]&@@(Count[processesSorted[[k]],#,Infinity,Heads->True]&/@{F,V,S}),"Substitution Momenta"];
-			(*ampsNumeric = ampsNumeric /. MapThread[#1->#2&, {masseslist, EFTSeries[Sqrt@mphys2[#,modelfull],EFTOrder]&/@processes[[k]]}];
-			ampsNumeric = EchoTiming[EFTSeries[EchoTiming[ExplicitEFTOrder @ ampsNumeric,"ExplicitEFTOrder"], EFTOrder],"Last EFT Series"];*)
-			matchEqs = Join[matchEqs, MapThread[Equal,Transpose@ampsNumeric]],
+			(*EchoTiming[If[Length@DeleteCases[Head/@Flatten[Expand@ampsNumeric],Plus]===0,
+				ampsNumeric = ({Total@Complement[#1,#2],Total@Complement[#2,#1]}&@@(List@@@#/.{0->{}})&)/@ Expand[ampsNumeric];
+			];,"Cancelling terms between amplitudes"];*)
+			(*ampsNumeric = EchoTiming[Collect[ampsNumeric,Union[CoeffList[modelfull],CoeffList[modelphys]], Simplify],"simplifying numerical expression"];*)
+			
+			matchEqs = Join[matchEqs, MapThread[Equal,Transpose@ampsNumeric]];
+			If[Length@matchEqs >= Max[Append[Length/@Echo@GatherBy[DeleteDuplicates@Cases[ampsNumeric[[1,2]],Coeff[___,modelphys],Infinity],#[[2]]&],0]],
+					Break[]],
 		nEqs];
 		
 		hola = matchEqs;
 		
-		red = EchoTiming[SolvePerturbative[ExplicitEFTOrder@matchEqs, varsPhys],"Solving system"];
+		(*matchEqs = matchEqs[[1;;Max[Append[Values[CountsBy[DeleteDuplicates@Cases[ampsNumeric[[1,2]],Coeff[___,modelphys],Infinity],#[[2]]&]],0]]]];*)
+		
+		red = EchoTiming[SolvePerturbative2[ExplicitEFTOrder@matchEqs, varsPhys],"Solving system"];
 		
 		(*Symplifying the solution according to the EFT power of the reduced coefficients*)
 		(*This could be achieved with a standard simplify, but due to the huge rational expressions
@@ -232,11 +276,11 @@ RedBasis[modelfull_, modelphys_, EFTOrder_, OptionsPattern[]]:=Module[{reduction
 		maxPowerOfMass = Max/@(Cases[#,Coeff[_,order_,___]:>order,{-2}]/.{}->{0}&/@ Values[red]);
 		coeffPowerOfMass = TrueEFTOrder/@ Keys[red];
 
-		red = MapThread[
+		EchoTiming[red = MapThread[
 			#1 -> Normal@Series[
-					Expand[#2]/.{MPhysSymbol[a_]:> xxx MPhysSymbol[a], coeff:Coeff[c_,o_,modelphys] :> xxx^(o-TrueEFTOrder[coeff]) coeff},
+					#2/.{MPhysSymbol[a_]:> xxx MPhysSymbol[a], coeff:Coeff[c_,o_,modelphys] :> xxx^(o-TrueEFTOrder[coeff]) coeff},
 					{xxx,0,#3}]&
-				,{Keys[red], Values[red], maxPowerOfMass-coeffPowerOfMass}];
+				,{Keys[red], Values[red], maxPowerOfMass-coeffPowerOfMass}],"Reducing solution"];
 		
 		reduction = Echo@Join[reduction, red/.{xxx->1}//Simplify];
 		,
@@ -295,14 +339,15 @@ AmplitudeComputation[process_,EFTOrder_,model_,OptionsPattern[]]:=Module[{fields
 	
 	(*Identifying identical particles for the crossings*)
 	identicalParticles =Flatten@Position[process,#,{1}]&/@DeleteDuplicates[process];
-	{unCrossedTopos, crossingPerms, numCrossedTopos} = FindCrossings[topos, identicalParticles];
+	{representativeGraphs, graphClasses, graphPerms} = FindIsomorphisms[topos, identicalParticles];
 	
-	diags = Quiet@InsertFields[unCrossedTopos,process->{},InsertionLevel->{Particles},ExcludeParticles->OptionValue[ExcludeParticles],Model->model,GenericModel->model];
+	diags = Quiet@InsertFields[topos[[representativeGraphs]], process->{},
+						InsertionLevel->{Particles},ExcludeParticles->OptionValue[ExcludeParticles],Model->model,GenericModel->model];
 	
 	(*See what topologies have succeeded upon the insertion of fields*)
 	insertedTopos=List@@(TakeGraph/@diags/.a_[b___,Field[__]]:>a[b]);
 	(*Find the position of these*)
-	posInsertedTopos=Flatten@Map[Position[List@@unCrossedTopos,#]&,insertedTopos];
+	posInsertedTopos=Flatten@Map[Position[topos[[List@@representativeGraphs]],#]&,insertedTopos];
 	
 	amp = (FCFAConvert[CreateFeynAmp[Head[diags]@#],IncomingMomenta->momentaList,List->True] &/@(List@@diags))/.RenameCoeff[model];
 	
@@ -330,10 +375,10 @@ AmplitudeComputation[process_,EFTOrder_,model_,OptionsPattern[]]:=Module[{fields
 	
 	If[OptionValue[SeparateCrossings]===True, 
 		
-		Return[{amp, crossingPerms[[posInsertedTopos]]}]
+		Return[{amp, graphPerms[[posInsertedTopos]]}]
 	 ];
 	
-	Return[Plus@@UnDoCrossings[amp, crossingPerms[[posInsertedTopos]]]];
+	Return[Plus@@RecoverFullAmplitude[amp, graphPerms[[posInsertedTopos]]]];
 ]
 
 
@@ -378,7 +423,7 @@ AllPropagatorAttributes[model_,EFTOrder_]:=Module[{fields, masses, allPropAtt},
 ]
 
 
-Bare2PhysMass[fields_List,EFTOrder_,model_] := Bare2PhysMass[#,EFTOrder,model]&/@fields
+Bare2PhysMass[fields_List,EFTOrder_,model_] := DeleteDuplicates[Bare2PhysMass[#,EFTOrder,model]&/@fields]
 
 Bare2PhysMass[field_,EFTOrder_,model_] := Bare2PhysMass[field,EFTOrder,model] = Block[{res,sol,mbaresol},
 
@@ -396,6 +441,90 @@ Bare2PhysMass[field_,EFTOrder_,model_] := Bare2PhysMass[field,EFTOrder,model] = 
 
 (* ::Section:: *)
 (*Crossing - related functions*)
+
+
+FindIsomorphisms[t_TopologyList]:=Module[{graphIndexed,graphIso,idGraphIso,permIso},
+
+(*We gather the graphs by groups of isomorphic graphs by showing their canonical graph is equal*)
+graphIndexed=GatherBy[Flatten/@MapIndexed[List,Topology2Graph[t]],CanonicalGraph[First[#]]&];
+
+{graphIso,idGraphIso}=Transpose[Transpose/@graphIndexed];
+
+(*We find the isomorphism between groups of graphs*)
+permIso=Flatten[(FindGraphIsomorphism@@@Thread[{First[#],#}])]&/@graphIso;
+
+{First/@idGraphIso,idGraphIso,permIso}
+]
+
+
+FindIsomorphisms[t_TopologyList,allowedPerms_List]:=
+	{#1,#2,(KeySelect[#<=Length[Flatten[allowedPerms]]&]/@#)&/@#3} &@@ FindIsomorphisms[t]/;Length[allowedPerms]===1
+
+
+FindIsomorphisms[t_TopologyList,allowedPerms_List]:=Module[{graph,nParticles,representativeGraphs,graphClasses,permClasses,
+cycleClasses,cycle2Graph,subgroups,subgroup,finalGraphClasses,finalCycleClasses,finalPermClasses,cycleNewClasses},
+
+	graph=Topology2Graph[t];
+	nParticles=Length[Flatten[allowedPerms]];
+	
+	(*We find every topology allowing ANY permutation between external legs*)
+	{representativeGraphs,graphClasses,permClasses}=FindIsomorphisms[t];
+
+	(*We convert permutation in cycle notation*)
+	cycleClasses=Table[FindPermutation/@(Range[nParticles]/.#&/@(Normal/@perms)),{perms,permClasses}];
+	cycle2Graph=MapThread[<|Thread[#1->#2]|>&,{cycleClasses,graphClasses}];
+	
+	(*We find the subgroup of allowed permutations*)
+	subgroups=(PermutationGroup[Cycles[{#}]&/@DeleteCases[Tuples[{#,#}],{n_,n_}]])&/@allowedPerms;
+	subgroup=PermutationGroup[Join@@(GroupElements/@subgroups)];
+	
+	(*We separate each class in subclasses so that every cycle within every subclass is connected by
+	a permutation of the subgroup. This would be done by gathering equivalence classes with right cosets. However,
+	we have the freedom of first rotating the representative graph with whatever automorphism we want. Therefore,
+	we need the equivalence classes with right cosets of the subgroup of allowed permutations and left cosets of
+	the automorphism group of the representative diagram (double cosets).*)
+	cycleNewClasses=Table[
+		With[{aut=GraphAutomorphismGroup2[graph[[representativeGraphs[[class]]]]]/.Cycles[{___,{___,n_/;n>nParticles,___},___}]->Nothing},
+			Reap[NestWhile[Complement[#,
+				Sow[Intersection[#,doubleCoset[subgroup,First[#],aut]]]]&,
+				cycleClasses[[class]],#=!={}&]][[2,1]]
+			],{class,Length[cycleClasses]}];
+
+	(*We find the index of the diagrams associated to the cycles in each subclass*)
+	finalGraphClasses=Flatten[Table[(cycle2Graph[[class]][#]&/@#)&/@cycleNewClasses[[class]],{class,Length[cycleNewClasses]}],1];
+	
+	(*We flatten the subclasses to the first level, so that they are now different classes*)
+	cycleNewClasses=Flatten[cycleNewClasses,1];
+	
+	(*We find the permutation to the new representative of each class. If the diagram D_i was referred to a representative
+diagram D_0 by D_i = p_i(D_0), and analogously for D_j, and now D_i is the new representative of D_j, then
+D_j = p_j(D_0) = p_j*p_i^{-1}(D_i)*)
+	finalCycleClasses=Table[PermutationProduct[#,InversePermutation[class[[1]]]]&/@class,{class,cycleNewClasses}];
+	
+	(*We transform cycle notation into permutations of legs*)
+	finalPermClasses=(Thread[Range[nParticles]->Permute[Range[nParticles],#]]&/@#)&/@finalCycleClasses;
+
+	{First/@finalGraphClasses,finalGraphClasses,finalPermClasses}
+
+]
+
+
+PermuteAmplitudes[amps_,perms_]:=Table[(amp/.(Normal[#]/.{i_Integer:>Symbol["P"<>ToString@i]})) &/@perms, {amp,amps}]
+
+RecoverFullAmplitude[amps_List,crossingsList_List]:=Flatten[MapThread[PermuteAmplitudes[#1,#2]&,{amps,crossingsList}]];
+
+
+Topology2Graph[t_TopologyList] := Topology2Graph[t] = Graph@Cases[#,Propagator[_][Vertex[_][id1_],Vertex[_][id2_]]:>UndirectedEdge[id1,id2],Infinity]&/@(List@@t);
+
+
+GraphAutomorphismGroup2[g_] := GraphAutomorphismGroup[g]/.(VertexIndex[g,#]-># &/@ VertexList[g])
+
+
+doubleCoset[GL_,g_,GR_] := Flatten[Outer[PermutationProduct,GroupElements[GL],{g},GroupElements[GR]]]
+
+
+(* ::Section:: *)
+(*Old Crossing - related functions*)
 
 
 FindCrossings[graphs_]:=Block[{graphsIDordered,graphWPos,crossedDiags,vertsOrder,cycles,nParticles,crossingPerms,numCrossedDiags},
@@ -520,7 +649,11 @@ IsGoodPermutationQ[perm_List,subSets_]:=And@@Table[AnyTrue[subSets,SubsetQ[#,per
 
 EFTSeries[A_ +B_,EFTOrder_]:=EFTSeries[A,EFTOrder]+EFTSeries[B,EFTOrder]*)
 
+EFTSeries[exp_,n_]:=(ExplicitEFTOrder@exp/.{inv\[CapitalLambda]->0}) /;n<=4
+
 EFTSeries[exp_,n_]:=Normal@Series[ExplicitEFTOrder@exp,{inv\[CapitalLambda],0,n-4}]
+
+EFTSeries[exp_,n_, ExplicitEFTOrder->False]:=Normal@Series[exp,{inv\[CapitalLambda],0,n-4}]
 
 
 (*EFTSeriesRational[exp_List,EFTOrder_] := EFTSeriesRational[#,EFTOrder]&/@exp
@@ -588,7 +721,31 @@ SolvePerturbative[eqs_,vars_]:=Block[{maxdegree, eqs2=DeleteCases[eqs,True], sol
 ]
 
 
-(* ::Section::Closed:: *)
+SolvePerturbative2[eqs_,vars_]:=Block[{maxdegree, eqs2=DeleteCases[eqs,True], solution={}},
+
+	maxdegree=Max[Length/@Level[CoefficientList[eqs2/.{Equal->List},inv\[CapitalLambda]],{2}]];
+	eqs2=Transpose[MapThread[#1==#2&,#]&/@CoefficientList[eqs2/.{Equal->List},inv\[CapitalLambda],maxdegree]];
+	eqs2=Select[eqs2, MemberQ[Table[FreeQ[#,vars[[k]]],{k,Length[vars]}], False] &];
+	
+	If[eqs2==={},Return[{}]];
+	
+	Fold[Join[#1,SolveLinearSystem[Flatten[#2[[1]]/.#1],#2[[2]]]]&,{},Transpose[{eqs2,GatherBy[vars,#[[2]]&]}]]
+]
+
+
+SolveLinearSystem[eqs_,vars_]:=Module[{coefVars,matrixA,chosenEqs,vectorB,eqs2},
+
+	eqs2 = DeleteCases[eqs,True];
+
+	matrixA=(Simplify[DeleteCases[Coefficient[#[[2]],vars],{0,0}->_]])&/@eqs2;
+	
+	vectorB=(#[[1]]-#[[2]])/.Thread[vars->0]&/@(eqs2);
+	
+	Thread[vars->LinearSolve[matrixA,vectorB]]
+]
+
+
+(* ::Section:: *)
 (*Reading model and coefficient tools*)
 
 

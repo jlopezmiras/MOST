@@ -171,6 +171,19 @@ SustMomentaOptimized[amp_List,fermions_,vectors_,scalars_,mlist_]:=Module[{eList
 	
 	ampList={};
 	
+	replaceFunction = MapIndexed[Function[{a,b},a->Slot[b[[1]]]], Flatten[{
+				Table[Spinor[Momentum[Symbol["P"<>ToString[i]]],0,1],{i,1,fermions}],
+				Table[Spinor[-Momentum[Symbol["P"<>ToString[i]]],0,1],{i,1,fermions}],
+				Table[Momentum[Polarization[Symbol["P"<>ToString[fermions+i]],I]],{i,1,vectors}],
+				Table[Momentum[Polarization[Symbol["P"<>ToString[fermions+i]],-I]],{i,1,vectors}],
+				Table[Momentum[Symbol["P"<>ToString[i]]],{i,1,scalars+fermions+vectors}]
+				}]
+			];
+	
+	optimizeAmps = Map[Function@@
+		(Experimental`OptimizeExpression[#]//.ProjectorSust//.{Pair->Simplify@*MDot, DiracGamma->pslash, Eps->EpsContract}) /. replaceFunction &,
+		amp];
+	
 	Do[
 	\[Epsilon]=eList[[j]];
 	\[Epsilon]c=ecList[[j]];
@@ -182,17 +195,11 @@ SustMomentaOptimized[amp_List,fermions_,vectors_,scalars_,mlist_]:=Module[{eList
 	Table[Momentum[Symbol["P"<>ToString[i]]]->randomValues[[1]][[i]],{i,1,scalars+fermions+vectors}]
 	}];
 	
-	replaceFunction = MapIndexed[Function[{a,b},a->Slot[b[[1]]]], Keys[listReplacements]];
-	
-	optimizeAmps = Map[Function@@
-		(Experimental`OptimizeExpression[#]//.ProjectorSust//.{ DiracGamma->pslash, Eps->EpsContract}) /. replaceFunction &,
-		amp];
+	(*replaceFunction = MapIndexed[Function[{a,b},a->Slot[b[[1]]]], Keys[listReplacements]];*)
 		
-	(*optimizeAmps = Map[Function@@
-		({#}//.ProjectorSust//.{Pair[args__]:>Simplify@MDot[args], DiracGamma->pslash, Eps->EpsContract})/. replaceFunction &,
-		amp];*)
 	(* We also replace listReplacements again in case OptimizeExpression did something strange *)
-	AppendTo[ampList, Quiet@Simplify[#@@Values[listReplacements] /. Pair[args__]:>Simplify@MDot[args] /. listReplacements, TimeConstraint->{0.01,1}] &/@ optimizeAmps],
+
+	AppendTo[ampList, (#@@Values[listReplacements] /. listReplacements) &/@ optimizeAmps],
 	
 	{j,1,Length[eList]}];
 Return[ampList];
